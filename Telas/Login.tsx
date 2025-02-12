@@ -40,8 +40,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#191919',
   },
   logo: {
-    width: width * 0.4, // 40% da largura da tela
-    height: width * 0.4, // Mantendo proporção
+    width: width * 0.6, // 40% da largura da tela
+    height: width * 0.6, // Mantendo proporção
     marginBottom: width * 0.08,
     resizeMode: 'contain',
   },
@@ -51,9 +51,9 @@ const styles = StyleSheet.create({
   },
   input: {
     width: '100%',
-    paddingVertical: width * 0.05, // Tamanho do padding ajustável
+    paddingVertical: width * 0.02, // Tamanho do padding ajustável
     paddingHorizontal: width * 0.05,
-    borderWidth: 2,
+    borderWidth: width * 0.006, // Ajustando largura da borda
     backgroundColor: '#FEFFF5',
     borderColor: '#38B6FF',
     borderRadius: 27,
