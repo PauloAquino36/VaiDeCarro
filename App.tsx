@@ -1,17 +1,14 @@
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View } from 'react-native';
+import Login from './Telas/Login';
 import BotaoContornado from './Componentes/BotaoContornado';
 
 export default function App() {
 
-  const handlePress = () => {
-    alert('Botão pressionado!');
-  };
-
   return (
     <View style={styles.container}>
-      <BotaoContornado title="Pressione-me" onPress={handlePress} />
       <StatusBar style="auto" />
+      <Login />
     </View>
   );
 }
@@ -19,7 +16,7 @@ export default function App() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#191919',
+    backgroundColor: 'white',
     alignItems: 'center',
     justifyContent: 'center',
   },
