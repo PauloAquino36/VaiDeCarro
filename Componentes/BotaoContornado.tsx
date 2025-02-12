@@ -4,7 +4,12 @@ import { Text, TouchableOpacity, StyleSheet, Dimensions } from 'react-native';
 // Obtém as dimensões da tela
 const { width, height } = Dimensions.get('window');
 
-const BotaoContornado = ({ title, onPress }) => {
+interface BotaoContornadoProps {
+  title: string;
+  onPress: () => void;
+}
+
+const BotaoContornado: React.FC<BotaoContornadoProps> = ({ title, onPress }) => {
   return (
     <TouchableOpacity style={[styles.botao, { width: width * 0.4 }]} onPress={onPress}>
       <Text style={[styles.texto, { fontSize: width * 0.05 }]}>{title}</Text>
