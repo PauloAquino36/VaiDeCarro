@@ -1,10 +1,17 @@
 import React from 'react';
 import { View, TextInput, Image, StyleSheet, Dimensions } from 'react-native';
+import { NavigationProp, useNavigation } from '@react-navigation/native';
 import BotaoContornado from '../Componentes/BotaoContornado';
 
 const { width } = Dimensions.get('window');
 
 const Login = () => {
+  const navigation = useNavigation<NavigationProp<any>>();
+
+  const handleLogin = () => {
+    navigation.navigate('Inicio');
+  };
+
   return (
     <View style={styles.container}>
       <Image source={require('../assets/Imgs/VaiDeCarro_logo.png')} style={styles.logo} />
@@ -15,6 +22,7 @@ const Login = () => {
           keyboardType="email-address" 
           autoCapitalize="none" 
           placeholder="E-mail"
+          placeholderTextColor="#38B6FF"
         />
       </View>
 
@@ -23,10 +31,11 @@ const Login = () => {
           style={styles.input}  
           secureTextEntry 
           placeholder="Senha"
+          placeholderTextColor="#38B6FF"
         />
       </View>
 
-      <BotaoContornado title="Entrar" onPress={() => {}} />
+      <BotaoContornado title="Entrar" onPress={handleLogin} />
     </View>
   );
 };
