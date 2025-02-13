@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, TextInput, Image, StyleSheet, Dimensions } from 'react-native';
+import { View, TextInput, Image, StyleSheet, Dimensions, TouchableOpacity, Text } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import Navbar from '../Componentes/NavBar';
 import { useNavigation } from '@react-navigation/native';
@@ -23,6 +23,11 @@ const Inicio = () => {
         />
       </View>
 
+        <TouchableOpacity style={styles.botao}>
+          <Icon name="plus" size={width * 0.05} color="#38B6FF" style={styles.icon} />
+          <Text style={styles.textoBtn}>Adicionar</Text>
+        </TouchableOpacity>        
+
         <Alugado />
 
       <Navbar /> 
@@ -41,6 +46,7 @@ const styles = StyleSheet.create({
   logo: {
     width: width * 0.3,
     height: width * 0.3,
+    marginBottom: width * 0.0,
     resizeMode: 'contain',
   },
   searchContainer: {
@@ -59,6 +65,17 @@ const styles = StyleSheet.create({
     paddingVertical: width * 0.02,
     fontSize: width * 0.04,
     color: '#000',
+  },
+  botao: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginLeft: width * 0.65,
+    marginTop: width * 0.025,
+  },
+  textoBtn: {
+    color: 'white',
+    fontSize: width * 0.03,
+    fontWeight: 'bold',
   },
 });
 

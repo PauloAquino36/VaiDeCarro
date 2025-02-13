@@ -1,0 +1,19 @@
+{
+    "alugueis": [
+      {
+        "nome_cliente": "João Silva",
+        "telefone_cliente": "(11) 98765-4321",
+        "cpf_cliente": "12345678900",
+        "endereco_cliente": "Rua das Flores, 123, São Paulo - SP",
+        "data_nascimento_cliente": "1990-05-15",
+        "veiculo_selecionado": {
+          "id": 1,
+          "nome": "Chevrolet Camaro",
+          "foto": "camaro2019branco.jpg"
+        },
+        "hora_inicio_aluguel": "2024-02-12T08:00:00",
+        "hora_termino_aluguel": "2024-02-14T08:00:00"
+      }
+    ]
+  }
+  
