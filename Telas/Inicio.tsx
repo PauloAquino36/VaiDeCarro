@@ -33,7 +33,7 @@ const Inicio = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
+    justifyContent: 'flex-start',
     alignItems: 'center',
     padding: width * 0.1,
     backgroundColor: '#191919',
@@ -41,7 +41,6 @@ const styles = StyleSheet.create({
   logo: {
     width: width * 0.3,
     height: width * 0.3,
-    marginBottom: width * 0.08,
     resizeMode: 'contain',
   },
   searchContainer: {
