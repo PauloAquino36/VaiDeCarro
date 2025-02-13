@@ -13,7 +13,63 @@
         },
         "hora_inicio_aluguel": "2024-02-12T08:00:00",
         "hora_termino_aluguel": "2024-02-14T08:00:00"
-      }
+      },
+        {
+            "nome_cliente": "Maria Oliveira",
+            "telefone_cliente": "(11) 98765-4321",
+            "cpf_cliente": "12345678900",
+            "endereco_cliente": "Rua das Flores, 123, São Paulo - SP",
+            "data_nascimento_cliente": "1990-05-15",
+            "veiculo_selecionado": {
+            "id": 2,
+            "nome": "Ford Mustang",
+            "foto": "mustang2019preto.jpg"
+            },
+            "hora_inicio_aluguel": "2024-02-12T08:00:00",
+            "hora_termino_aluguel": "2024-02-14T08:00:00"
+        },
+        {
+            "nome_cliente": "José Santos",
+            "telefone_cliente": "(11) 98765-4321",
+            "cpf_cliente": "12345678900",
+            "endereco_cliente": "Rua das Flores, 123, São Paulo - SP",
+            "data_nascimento_cliente": "1990-05-15",
+            "veiculo_selecionado": {
+            "id": 3,
+            "nome": "Dodge Challenger",
+            "foto": "challenger2019vermelho.jpg"
+            },
+            "hora_inicio_aluguel": "2024-02-12T08:00:00",
+            "hora_termino_aluguel": "2024-02-14T08:00:00"
+        },
+        {
+            "nome_cliente": "Ana Souza",
+            "telefone_cliente": "(11) 98765-4321",
+            "cpf_cliente": "12345678900",
+            "endereco_cliente": "Rua das Flores, 123, São Paulo - SP",
+            "data_nascimento_cliente": "1990-05-15",
+            "veiculo_selecionado": {
+            "id": 4,
+            "nome": "Chevrolet Corvette",
+            "foto": "corvette2019amarelo.jpg"
+            },
+            "hora_inicio_aluguel": "2024-02-12T08:00:00",
+            "hora_termino_aluguel": "2024-02-14T08:00:00"
+        },
+        {
+            "nome_cliente": "Carlos Lima",
+            "telefone_cliente": "(11) 98765-4321",
+            "cpf_cliente": "12345678900",
+            "endereco_cliente": "Rua das Flores, 123, São Paulo - SP",
+            "data_nascimento_cliente": "1990-05-15",
+            "veiculo_selecionado": {
+            "id": 5,
+            "nome": "Dodge Viper",
+            "foto": "viper2019azul.jpg"
+            },
+            "hora_inicio_aluguel": "2024-02-12T08:00:00",
+            "hora_termino_aluguel": "2024-02-14T08:00:00"
+        }
     ]
   }
   

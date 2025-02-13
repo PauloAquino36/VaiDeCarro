@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Text, TouchableOpacity, StyleSheet, Dimensions, View, Image } from 'react-native';
+import { Text, TouchableOpacity, StyleSheet, Dimensions, View, Image, ScrollView } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import alugueisData from '../bancoDados/Dados/Alugados.json';
 
@@ -21,50 +21,60 @@ interface Aluguel {
 }
 
 const Alugado = () => {
-  const [aluguel, setAluguel] = useState<Aluguel | null>(null);
+  const [alugueis, setAlugueis] = useState<Aluguel[]>([]);
 
   useEffect(() => {
     if (alugueisData.alugueis.length > 0) {
-      setAluguel(alugueisData.alugueis[0]);
+      setAlugueis(alugueisData.alugueis);
     }
   }, []);
 
-  if (!aluguel) {
+  if (alugueis.length === 0) {
     return <Text style={styles.texto}>Carregando...</Text>;
   }
 
   return (
-    <View style={styles.container}>
-      <Image 
-        source={{ uri: `../bancoDados/Carros/${aluguel.veiculo_selecionado.foto}` }} 
-        style={styles.carro} 
-      />
+    <ScrollView contentContainerStyle={styles.scrollContainer}>
+      {alugueis.map((aluguel, index) => (
+        <View key={index} style={styles.container}>
+          <Image
+            source={{ uri: `../bancoDados/Carros/${aluguel.veiculo_selecionado.foto}` }}
+            style={styles.carro}
+          />
+          <View style={styles.info}>
+            <Text style={styles.texto}>{`${aluguel.veiculo_selecionado.nome}`}</Text>
+            <Text style={styles.texto}>{`${aluguel.nome_cliente}`}</Text>
+            <Text style={styles.textoData}>
+              {`${new Date(aluguel.hora_inicio_aluguel).toLocaleDateString()} - ${new Date(aluguel.hora_termino_aluguel).toLocaleDateString()}`}
+            </Text>
 
-      <View style={styles.info}>
-        <Text style={styles.texto}>{`${aluguel.veiculo_selecionado.nome}`}</Text>
-        <Text style={styles.texto}>{`${aluguel.nome_cliente}`}</Text>
-        <Text style={styles.textoData}>{`${new Date(aluguel.hora_inicio_aluguel).toLocaleDateString()} - ${new Date(aluguel.hora_termino_aluguel).toLocaleDateString()}`}</Text>
-
-        <TouchableOpacity style={styles.botao}>
-          <Icon name="check-square-o" size={width * 0.05} color="#38B6FF" />
-          <Text style={styles.textoBtn}>Confirmar devolução</Text>
-        </TouchableOpacity>
-      </View>
-    </View>
+            <TouchableOpacity style={styles.botao}>
+              <Icon name="check-square-o" size={width * 0.05} color="#38B6FF" />
+              <Text style={styles.textoBtn}>Confirmar devolução</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      ))}
+    </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
+  scrollContainer: {
+    paddingVertical: 10,
+    alignItems: 'center',
+  },
   container: {
     marginTop: width * 0.025,
     width: width * 0.8,
-    height: width * 0.25,
+    height: 'auto', // Deixe a altura ajustável
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: width * 0.004,
     borderColor: '#5271FF',
     borderRadius: 30,
+    marginBottom: 15,
   },
   info: {
     justifyContent: 'center',
@@ -77,14 +87,16 @@ const styles = StyleSheet.create({
     resizeMode: 'contain',
   },
   texto: {
-    color: 'white',
+    color: 'white', // Ajuste para uma cor mais visível
     fontSize: width * 0.03,
     fontWeight: 'bold',
+    marginVertical: 5,
   },
   textoData: {
-    color: 'white',
+    color: 'white', // Ajuste para uma cor mais visível
     fontSize: width * 0.03,
     fontWeight: 'bold',
+    marginVertical: 5,
   },
   textoBtn: {
     color: 'white',
