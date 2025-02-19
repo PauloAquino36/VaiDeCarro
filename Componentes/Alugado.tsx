@@ -87,13 +87,13 @@ const styles = StyleSheet.create({
     resizeMode: 'contain',
   },
   texto: {
-    color: 'white', // Ajuste para uma cor mais visível
+    color: 'white',
     fontSize: width * 0.03,
     fontWeight: 'bold',
     marginVertical: 5,
   },
   textoData: {
-    color: 'white', // Ajuste para uma cor mais visível
+    color: 'white',
     fontSize: width * 0.03,
     fontWeight: 'bold',
     marginVertical: 5,

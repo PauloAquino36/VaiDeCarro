@@ -1,0 +1,55 @@
+{
+    "carros": [
+      {
+        "id": 1,
+        "foto": "camaro2019branco.jpg",
+        "nome": "Chevrolet Camaro",
+        "ano": 2019,
+        "preco_por_hora": 110.00,
+        "consumo_por_litro": 7.8,
+        "placa": "JKL-1213",
+        "status": "disponível"
+      },
+      {
+        "id": 2,
+        "foto": "mustang2019preto.jpg",
+        "nome": "Ford Mustang",
+        "ano": 2019,
+        "preco_por_hora": 120.00,
+        "consumo_por_litro": 8.5,
+        "placa": "GHI-9101",
+        "status": "indisponível"
+      },
+      {
+        "id": 3,
+        "foto": "challenger2019vermelho.jpg",
+        "nome": "Dodge Challenger",
+        "ano": 2019,
+        "preco_por_hora": 115.00,
+        "consumo_por_litro": 7.5,
+        "placa": "PQR-1617",
+        "status": "indisponível"
+      },
+      {
+        "id": 4,
+        "foto": "corvette2019amarelo.jpg",
+        "nome": "Chevrolet Corvette",
+        "ano": 2019,
+        "preco_por_hora": 130.00,
+        "consumo_por_litro": 6.9,
+        "placa": "STU-1819",
+        "status": "indisponível"
+      },
+      {
+        "id": 5,
+        "foto": "viper2019azul.jpg",
+        "nome": "Dodge Viper",
+        "ano": 2019,
+        "preco_por_hora": 140.00,
+        "consumo_por_litro": 6.5,
+        "placa": "VWX-2021",
+        "status": "indisponível"
+      }
+    ]
+  }
+  

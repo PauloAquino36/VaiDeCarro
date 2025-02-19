@@ -1,34 +1,34 @@
 import React from 'react';
-import { View, TextInput, Image, StyleSheet, Dimensions, TouchableOpacity, Text } from 'react-native';
-import Icon from 'react-native-vector-icons/FontAwesome';
+import { View, Image, StyleSheet, Dimensions, Text } from 'react-native';
 import Navbar from '../Componentes/NavBar';
 import { useNavigation } from '@react-navigation/native';
-import Alugado from '../Componentes/Alugado';
+import BotaoContornado from '../Componentes/BotaoContornado';
 
 const { width } = Dimensions.get('window');
 
-const Inicio = () => {
+const Sair = () => {
   const navigation = useNavigation();
 
+  const sair = () => {
+    console.log('Saindo...');
+    navigation.navigate('Login');
+  };
+
+  const Nsair = () => {
+    console.log('Não saiu...');
+    navigation.goBack();
+  };
+
   return (
-    <View style={styles.container}>
-      <Image source={require('../assets/Imgs/VaiDeCarro_logo.png')} style={styles.logo} />
-
-      <View style={styles.searchContainer}>
-        <Icon name="search" size={width * 0.05} color="#38B6FF" style={styles.icon} />
-        <TextInput 
-          style={styles.searchBar} 
-          placeholder="Pesquisar..." 
-          placeholderTextColor="#888"
-        />
-      </View>
-
-        <TouchableOpacity style={styles.botao}>
-          <Icon name="print" size={width * 0.05} color="#38B6FF" style={styles.icon} />
-          <Text style={styles.textoBtn}>Relatorio</Text>
-        </TouchableOpacity>        
-
-        <Alugado />
+    <View style={styles.container}>      
+    
+            <Image source={require('../assets/Imgs/VaiDeCarro_logo.png')} style={styles.logo} /> 
+            
+            <View style={styles.container2}>
+                <Text style={styles.texto}>Deseja realmente sair?</Text>
+                <BotaoContornado title="Sim" onPress={sair} />
+                <BotaoContornado title="Não" onPress={Nsair} />
+            </View>
 
       <Navbar /> 
     </View>
@@ -42,6 +42,15 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: width * 0.05,
     backgroundColor: '#191919',
+  },
+  container2: {
+    marginTop: width * 0.15,
+    padding: width * 0.05,
+    borderWidth: 1,
+    borderColor: '#38B6FF',
+    width: width * 0.5,
+    height: width * 0.5,
+    alignItems: 'center',
   },
   logo: {
     width: width * 0.3,
@@ -72,6 +81,11 @@ const styles = StyleSheet.create({
     marginLeft: width * 0.65,
     marginTop: width * 0.025,
   },
+  texto: {
+    color: 'white',
+    fontSize: width * 0.05,
+    fontWeight: 'bold',
+  },
   textoBtn: {
     color: 'white',
     fontSize: width * 0.03,
@@ -79,4 +93,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default Inicio;
+export default Sair;

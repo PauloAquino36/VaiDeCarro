@@ -19,6 +19,7 @@ const BotaoContornado: React.FC<BotaoContornadoProps> = ({ title, onPress }) => 
 
 const styles = StyleSheet.create({
   botao: {
+    margin: width * 0.02,
     borderWidth: 2,
     borderColor: '#FEFFF5',
     backgroundColor: '#38B6FF',

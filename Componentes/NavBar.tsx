@@ -14,7 +14,7 @@ const Navbar = () => {
       <NavItem icon="home" text="Início" navigation={navigation} screen="Inicio" routeName={route.name} />
       <NavItem icon="car" text="Carros" navigation={navigation} screen="Carros" routeName={route.name} />
       <NavItem icon="users" text="Membros" navigation={navigation} screen="Membros" routeName={route.name} />
-      <NavItem icon="sign-out" text="Sair" navigation={navigation} screen="Login" routeName={route.name} />
+      <NavItem icon="sign-out" text="Sair" navigation={navigation} screen="Sair" routeName={route.name} />
     </View>
   );
 };
