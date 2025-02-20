@@ -6,7 +6,9 @@
         "cargo": "Gerente",
         "telefone": "(11) 91234-5678",
         "email": "carlos.silva@aluguelcar.com",
-        "foto": "fotoMembros.png"
+        "foto": "fotoMembros.png",
+        "senha": "123456",
+        "cpf": "123.456.789-00"
       },
       {
         "id": 2,
@@ -14,7 +16,9 @@
         "cargo": "Atendente",
         "telefone": "(11) 98765-4321",
         "email": "ana.souza@aluguelcar.com",
-        "foto": "ana.jpg"
+        "foto": "ana.jpg",
+        "senha": "654321",
+        "cpf": "987.654.321-00"
       },
       {
         "id": 3,
@@ -22,7 +26,9 @@
         "cargo": "Mecânico",
         "telefone": "(11) 97654-3210",
         "email": "fernando.oliveira@aluguelcar.com",
-        "foto": "fernando.jpg"
+        "foto": "fernando.jpg",
+        "senha": "321654",
+        "cpf": "654.321.987-00"
       },
       {
         "id": 4,
@@ -30,7 +36,9 @@
         "cargo": "Recepcionista",
         "telefone": "(11) 96543-2109",
         "email": "mariana.lima@aluguelcar.com",
-        "foto": "mariana.jpg"
+        "foto": "mariana.jpg",
+        "senha": "456789",
+        "cpf": "456.789.123-00"
       },
       {
         "id": 5,
@@ -38,7 +46,9 @@
         "cargo": "Motorista",
         "telefone": "(11) 95432-1098",
         "email": "joao.pereira@aluguelcar.com",
-        "foto": "joao.jpg"
+        "foto": "joao.jpg",
+        "senha": "987654",
+        "cpf": "789.123.456-00"
       }
     ]
   }
