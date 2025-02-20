@@ -11,7 +11,9 @@ interface BotaoContornadoProps {
 
 const BotaoContornado: React.FC<BotaoContornadoProps> = ({ title, onPress }) => {
   return (
+
     <TouchableOpacity style={[styles.botao, { width: width * 0.4 }]} onPress={onPress}>
+    
       <Text style={[styles.texto, { fontSize: width * 0.05 }]}>{title}</Text>
     </TouchableOpacity>
   );

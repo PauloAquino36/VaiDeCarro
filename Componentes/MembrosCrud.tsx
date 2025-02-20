@@ -1,63 +1,54 @@
 import React, { useEffect, useState } from 'react';
 import { Text, TouchableOpacity, StyleSheet, Dimensions, View, Image, ScrollView } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
-import carrosData from '../bancoDados/Dados/Carros.json';
+import membrosData from '../bancoDados/Dados/Membros.json';
+
+interface Membro {
+  nome: string;
+  idade: number;
+  foto: string;
+}
 
 const { width } = Dimensions.get('window');
 
-const CarrosCrud = () => {
-  interface Carro {
-    nome: string;
-    ano: number;
-    preco_por_hora: number;
-    consumo_por_litro: number;
-    placa: string;
-    status: string;
-    foto: string;
-  }
 
-  const [carros, setCarros] = useState<Carro[]>([]);
+const MembrosCrud = () => {
+  const [membros, setMembros] = useState<Membro[]>([]);
 
   useEffect(() => {
-    if (carrosData.carros.length > 0) {
-      setCarros(carrosData.carros);
+    if (membrosData.membros.length > 0) {
+      setMembros(membrosData.membros);
     }
   }, []);
 
-  if (carros.length === 0) {
+  if (membros.length === 0) {
     return <Text style={styles.texto}>Carregando...</Text>;
   }
 
   return (
     <ScrollView contentContainerStyle={styles.scrollContainer}>
-      {carros.map((carro, index) => (
+      {membros.map((membro, index) => (
         <View key={index} style={styles.container}>
-          <Image source={{ uri: `https://images.app.goo.gl/k5x2na3LijBRb6fR9` }} style={styles.carro} />
+        <Image source={require("../bancoDados/Membros/fotoMembros.png")} style={styles.membro} />          
           <View style={styles.info}>
-            <Text style={styles.texto}>{carro.nome} - {carro.ano}</Text>
-
-            <TouchableOpacity style={styles.botao} disabled={carro.status === 'indisponível'}>
-              <Icon name="user-plus" size={width * 0.05} color={carro.status === 'disponível' ? "#38B6FF" : "gray"} />
-              <Text style={styles.textoBtn}>{carro.status === 'disponível' ? 'Alugar' : 'Indisponível'}</Text>
-            </TouchableOpacity>
+            <Text style={styles.texto}>{membro.nome}</Text>
 
             <View style={styles.botoesContainer}>
               <TouchableOpacity style={styles.botao}>
                 <Icon name="eye" size={width * 0.05} color={"#38B6FF"} />
-                <Text style={styles.textoBtn}>{'Ver'}</Text>
+                <Text style={styles.textoBtn}>Ver</Text>
               </TouchableOpacity>
 
               <TouchableOpacity style={styles.botao}>
                 <Icon name="pencil" size={width * 0.05} color={"#38B6FF"} />
-                <Text style={styles.textoBtn}>{'Editar'}</Text>
+                <Text style={styles.textoBtn}>Editar</Text>
               </TouchableOpacity>
 
               <TouchableOpacity style={styles.botao}>
                 <Icon name="trash" size={width * 0.05} color={"#38B6FF"} />
-                <Text style={styles.textoBtn}>{'Deletar'}</Text>
+                <Text style={styles.textoBtn}>Deletar</Text>
               </TouchableOpacity>
             </View>
-
           </View>
         </View>
       ))}
@@ -80,18 +71,19 @@ const styles = StyleSheet.create({
     borderColor: '#5271FF',
     borderRadius: 30,
     marginBottom: 15,
+    padding: width * 0.01,
   },
   info: {
     justifyContent: 'center',
     alignItems: 'center',
     marginLeft: width * 0.05,
   },
-  carro: {
+  membro: {
     width: width * 0.19,
     height: width * 0.19,
     resizeMode: 'contain',
-    borderWidth: width * 0.004,
-    borderColor: 'red',
+    //borderWidth: width * 0.004,
+    //borderColor: 'red',
   },
   texto: {
     color: 'white',
@@ -113,11 +105,12 @@ const styles = StyleSheet.create({
   },
   botoesContainer: {
     flexDirection: 'row',
-    justifyContent: 'space-around',
-    width: '100%',
+    justifyContent: 'center',
     marginTop: 10,
-    marginRight: width * 0.25,
+    //borderWidth: 1,
+    //borderColor: '#38B6FF',
+
   },
 });
 
-export default CarrosCrud;
+export default MembrosCrud;

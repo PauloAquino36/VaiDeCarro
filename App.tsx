@@ -7,6 +7,7 @@ import Login from './Telas/Login';
 import Inicio from './Telas/Inicio';
 import Carros from './Telas/Carros';
 import Sair from './Telas/Sair';
+import Membros from './Telas/Membros';
 
 const Stack = createStackNavigator();
 
@@ -18,6 +19,7 @@ export default function App() {
           <Stack.Screen name="Login" component={Login} />
           <Stack.Screen name="Carros" component={Carros} />
           <Stack.Screen name="Sair" component={Sair} />
+          <Stack.Screen name="Membros" component={Membros} />
         </Stack.Navigator>
     </NavigationContainer>
   );

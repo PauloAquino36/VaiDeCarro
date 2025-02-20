@@ -2,39 +2,36 @@ import React, { useState } from 'react';
 import { View, TextInput, Image, StyleSheet, Dimensions, TouchableOpacity, Text, Modal } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import Navbar from '../Componentes/NavBar';
-import CarrosCrud from '../Componentes/CarrosCrud';
-import UploadFoto from '../Componentes/UploadFoto'; 
+import MembrosCrud from '../Componentes/MembrosCrud';
 
 const { width } = Dimensions.get('window');
 
-const Carros = () => {
+const Membros = () => {
   const [modalVisible, setModalVisible] = useState(false);
-  const [novoCarro, setNovoCarro] = useState({
+  const [novoMembro, setNovoMembro] = useState({
+    cargo: '',
     nome: '',
-    ano: '',
-    preco_por_hora: '',
-    consumo_por_litro: '',
-    placa: '',
-    status: 'disponível',
-    foto: '',
+    email: '',
+    senha: '',
+    numero: '',
+    cpf: '',
   });
 
-interface Carro {
+interface Membro {
+    cargo: string;
     nome: string;
-    ano: string;
-    preco_por_hora: string;
-    consumo_por_litro: string;
-    placa: string;
-    status: string;
-    foto: string;
+    email: string;
+    senha: string;
+    numero: string;
+    cpf: string;
 }
 
-const handleInputChange = (key: keyof Carro, value: string) => {
-    setNovoCarro({ ...novoCarro, [key]: value });
+const handleInputChange = (key: keyof Membro, value: string) => {
+    setNovoMembro({ ...novoMembro, [key]: value });
 };
 
-  const adicionarCarro = () => {
-    console.log('Novo carro adicionado:', novoCarro);
+  const adicionarMembro = () => {
+    console.log('Novo membro adicionado:', novoMembro);
     setModalVisible(false);
   };
 
@@ -51,65 +48,30 @@ const handleInputChange = (key: keyof Carro, value: string) => {
         />
       </View>
 
-      {/* Botão de adicionar */}
       <TouchableOpacity style={styles.botao} onPress={() => setModalVisible(true)}>
         <Icon name="plus" size={width * 0.05} color="#38B6FF" style={styles.icon} />
-        <Text style={styles.textoBtn}>Adicionar</Text>
+        <Text style={styles.textoBtn}>Adicionar Membro</Text>
       </TouchableOpacity>
 
-      <CarrosCrud />
+        <MembrosCrud />
 
-      {/* Modal de Adicionar Carro */}
       <Modal animationType="slide" transparent={true} visible={modalVisible}>
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>Adicionar Carro</Text>
+            <Text style={styles.modalTitle}>Adicionar Membro</Text>
 
-            <TextInput
-              style={styles.input}
-              placeholder="Nome"
-              placeholderTextColor="#888"
-              onChangeText={(value) => handleInputChange('nome', value)}
-            />
-            <TextInput
-              style={styles.input}
-              placeholder="Ano"
-              placeholderTextColor="#888"
-              keyboardType="numeric"
-              onChangeText={(value) => handleInputChange('ano', value)}
-            />
-            <TextInput
-              style={styles.input}
-              placeholder="Preço por Hora"
-              placeholderTextColor="#888"
-              keyboardType="numeric"
-              onChangeText={(value) => handleInputChange('preco_por_hora', value)}
-            />
-            <TextInput
-              style={styles.input}
-              placeholder="Consumo por Litro"
-              placeholderTextColor="#888"
-              keyboardType="numeric"
-              onChangeText={(value) => handleInputChange('consumo_por_litro', value)}
-            />
-            <TextInput
-              style={styles.input}
-              placeholder="Placa"
-              placeholderTextColor="#888"
-              onChangeText={(value) => handleInputChange('placa', value)}
-            />
-            <TextInput
-              style={styles.input}
-              placeholder="URL da Foto"
-              placeholderTextColor="#888"
-              onChangeText={(value) => handleInputChange('foto', value)}
-            />
+            <TextInput style={styles.input} placeholder="Cargo" onChangeText={(value) => handleInputChange('cargo', value)} />
+            <TextInput style={styles.input} placeholder="Nome" onChangeText={(value) => handleInputChange('nome', value)} />
+            <TextInput style={styles.input} placeholder="Email" keyboardType="email-address" onChangeText={(value) => handleInputChange('email', value)} />
+            <TextInput style={styles.input} placeholder="Senha" secureTextEntry onChangeText={(value) => handleInputChange('senha', value)} />
+            <TextInput style={styles.input} placeholder="Número" keyboardType="phone-pad" onChangeText={(value) => handleInputChange('numero', value)} />
+            <TextInput style={styles.input} placeholder="CPF" keyboardType="numeric" onChangeText={(value) => handleInputChange('cpf', value)} />
 
             <View style={styles.modalButtons}>
               <TouchableOpacity style={styles.modalButton} onPress={() => setModalVisible(false)}>
                 <Text style={styles.textoBtn}>Cancelar</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={styles.modalButton} onPress={adicionarCarro}>
+              <TouchableOpacity style={styles.modalButton} onPress={adicionarMembro}>
                 <Text style={styles.textoBtn}>Salvar</Text>
               </TouchableOpacity>
             </View>
@@ -117,9 +79,7 @@ const handleInputChange = (key: keyof Carro, value: string) => {
         </View>
       </Modal>
 
-
       <Navbar />
-
     </View>
   );
 };
@@ -165,7 +125,6 @@ const styles = StyleSheet.create({
     fontSize: width * 0.03,
     fontWeight: 'bold',
   },
-  /* Estilos do Modal */
   modalContainer: {
     flex: 1,
     justifyContent: 'center',
@@ -207,4 +166,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default Carros;
+export default Membros;
