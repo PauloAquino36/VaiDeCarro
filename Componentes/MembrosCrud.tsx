@@ -18,6 +18,12 @@ const MembrosCrud = () => {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState<boolean>(false);
   const [selectedMembro, setSelectedMembro] = useState<Membro | null>(null);
   const [editedName, setEditedName] = useState<string>('');
+  const [editedEmail, setEditedEmail] = useState<string>('');
+const [editedSenha, setEditedSenha] = useState<string>('');
+const [editedTelefone, setEditedTelefone] = useState<string>('');
+const [editedCpf, setEditedCpf] = useState<string>('');
+const [editedCargo, setEditedCargo] = useState<string>('');
+
 
   useEffect(() => {
     if (membrosData.membros.length > 0) {
@@ -33,6 +39,11 @@ const MembrosCrud = () => {
   const handleEdit = (membro: Membro) => {
     setSelectedMembro(membro);
     setEditedName(membro.nome); // Preenche o campo de edição com o nome do membro
+    setEditedEmail(membro.email);
+    setEditedTelefone(membro.telefone);
+    setEditedCpf(membro.cpf);
+    setEditedCargo(membro.cargo);
+    setEditedSenha(membro.senha);
     setShowEditModal(true);
   };
 
@@ -121,14 +132,51 @@ const MembrosCrud = () => {
       {selectedMembro && (
         <Modal visible={showEditModal} animationType="slide" transparent={true} onRequestClose={() => setShowEditModal(false)}>
           <View style={styles.modalContainer}>
-            <View style={styles.modalContent}>
+            <View style={styles.modalContentEdit}>
               <Text style={styles.modalTitle}>Editar Membro</Text>
+              <Text style={styles.modalTextInput}>Nome:</Text>
               <TextInput
                 style={styles.input}
                 value={editedName}
                 onChangeText={setEditedName}
                 placeholder="Digite o novo nome"
               />
+              <Text style={styles.modalTextInput}>Email:</Text>
+                <TextInput
+                    style={styles.input}
+                    value={editedEmail}
+                    onChangeText={setEditedEmail}
+                    placeholder="Digite o novo email"
+                />
+                <Text style={styles.modalTextInput}>Senha:</Text>
+                <TextInput
+                    style={styles.input}
+                    value={editedSenha}
+                    onChangeText={setEditedSenha}
+                    placeholder="Digite a nova senha"
+                />
+                <Text style={styles.modalTextInput}>Telefone:</Text>
+                <TextInput
+                    style={styles.input}
+                    value={editedTelefone}
+                    onChangeText={setEditedTelefone}
+                    placeholder="Digite o novo telefone"
+                />
+                <Text style={styles.modalTextInput}>CPF:</Text>
+                <TextInput
+                    style={styles.input}
+                    value={editedCpf}
+                    onChangeText={setEditedCpf}
+                    placeholder="Digite o novo CPF"
+                />
+                <Text style={styles.modalTextInput}>Cargo:</Text>
+                <TextInput
+                    style={styles.input}
+                    value={editedCargo}
+                    onChangeText={setEditedCargo}
+                    placeholder="Digite o novo cargo"
+                />
+
               <TouchableOpacity style={styles.saveBtn} onPress={handleSaveEdit}>
                 <Text style={styles.closeText}>Salvar</Text>
               </TouchableOpacity>
@@ -225,7 +273,15 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between', // Distribui o espaço entre as views
     alignItems: 'center', // Alinha as views ao centro verticalmente
   },
-  
+  modalContentEdit: {
+    backgroundColor: 'white',
+    padding: 20,
+    borderRadius: 10,
+    width: width * 0.8,
+    flexDirection: 'column',
+    justifyContent: 'space-between', // Distribui o espaço entre as views
+    alignItems: 'flex-start', // Alinha as views ao centro verticalmente
+  },
   modalContentText: {
     padding: 20,
   },
@@ -237,6 +293,11 @@ const styles = StyleSheet.create({
   modalText: {
     fontSize: 16,
     marginBottom: 10,
+  },
+  modalTextInput: {
+    fontSize: 17,
+    marginBottom: width * 0.02,
+    
   },
   modalImage: {
     width: width * 0.2,
@@ -250,6 +311,7 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     padding: 10,
     marginBottom: 20,
+    width: '100%',
   },
   saveBtn: {
     backgroundColor: '#38B6FF',
@@ -257,12 +319,14 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     alignItems: 'center',
     marginBottom: 10,
+    width: width * 0.15,
   },
   closeBtn: {
     backgroundColor: '#FF6347',
     padding: 10,
     borderRadius: 5,
     alignItems: 'center',
+    width: width * 0.15,
   },
   closeText: {
     color: 'white',
