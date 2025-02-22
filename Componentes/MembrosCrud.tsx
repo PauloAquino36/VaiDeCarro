@@ -2,11 +2,19 @@ import React, { useEffect, useState } from 'react';
 import { Text, TouchableOpacity, StyleSheet, Dimensions, View, Image, ScrollView, Modal, TextInput, Alert } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import membrosData from '../bancoDados/Dados/Membros.json';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 
 interface Membro {
+  id: number;
   nome: string;
   idade: number;
+  cargo: string;
+  telefone: string;
+  email: string;
   foto: string;
+  senha: string;
+  cpf: string;
 }
 
 const { width } = Dimensions.get('window');
@@ -25,11 +33,34 @@ const [editedCpf, setEditedCpf] = useState<string>('');
 const [editedCargo, setEditedCargo] = useState<string>('');
 
 
-  useEffect(() => {
-    if (membrosData.membros.length > 0) {
-      setMembros(membrosData.membros);
+useEffect(() => {
+  const carregarMembros = async () => {
+    try {
+      const jsonValue = await AsyncStorage.getItem('@membros');
+      if (jsonValue !== null) {
+        setMembros(JSON.parse(jsonValue));
+      } else {
+        setMembros(membrosData.membros); // Se não houver dados, usar o JSON inicial
+        await AsyncStorage.setItem('@membros', JSON.stringify(membrosData.membros));
+      }
+    } catch (error) {
+      console.error('Erro ao carregar membros:', error);
     }
-  }, []);
+  };
+
+  carregarMembros();
+}, []);
+
+  //Apagar
+  const salvarMembros = async (novosMembros: Membro[]) => {
+    try {
+      await AsyncStorage.setItem('@membros', JSON.stringify(novosMembros));
+      setMembros(novosMembros);
+    } catch (error) {
+      console.error('Erro ao salvar membros:', error);
+    }
+  };
+  
 
   const handleView = (membro: Membro) => {
     setSelectedMembro(membro);
@@ -52,25 +83,40 @@ const [editedCargo, setEditedCargo] = useState<string>('');
     setShowDeleteConfirm(true);
   };
 
-  const confirmDelete = () => {
+  const confirmDelete = async () => {
     if (selectedMembro) {
-      setMembros(membros.filter((membro) => membro.nome !== selectedMembro.nome));
-      setShowDeleteConfirm(false);
-      Alert.alert('Membro deletado com sucesso!');
+      try {
+        const novosMembros = membros.filter(membro => membro.id !== selectedMembro.id);
+        await salvarMembros(novosMembros);
+        setShowDeleteConfirm(false);
+        Alert.alert('Membro deletado com sucesso!');
+      } catch (error) {
+        Alert.alert('Erro ao excluir o membro!');
+      }
     }
   };
+  
+  
 
-  const handleSaveEdit = () => {
-    if (selectedMembro && editedName) {
-      setMembros(
-        membros.map((membro) =>
-          membro.nome === selectedMembro.nome ? { ...membro, nome: editedName } : membro
-        )
-      );
-      setShowEditModal(false);
-      Alert.alert('Membro editado com sucesso!');
+  const handleSaveEdit = async () => {
+    if (selectedMembro) {
+      try {
+        const novosMembros = membros.map(membro =>
+          membro.id === selectedMembro.id
+            ? { ...membro, nome: editedName, email: editedEmail, telefone: editedTelefone, cpf: editedCpf, cargo: editedCargo, senha: editedSenha }
+            : membro
+        );
+  
+        await salvarMembros(novosMembros);
+        setShowEditModal(false);
+        Alert.alert('Membro editado com sucesso!');
+      } catch (error) {
+        console.error('Erro ao editar o membro:', error);
+        Alert.alert('Erro ao editar o membro!');
+      }
     }
   };
+  
 
   if (membros.length === 0) {
     return <Text style={styles.texto}>Carregando...</Text>;
@@ -326,7 +372,7 @@ const styles = StyleSheet.create({
     padding: 10,
     borderRadius: 5,
     alignItems: 'center',
-    width: width * 0.15,
+    width: width * 0.2,
   },
   closeText: {
     color: 'white',

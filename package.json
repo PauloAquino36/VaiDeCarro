@@ -10,14 +10,20 @@
     "web": "expo start --web"
   },
   "dependencies": {
-    "@react-native-async-storage/async-storage": "^2.1.1",
+    "@react-native-async-storage/async-storage": "1.23.1",
     "@react-navigation/bottom-tabs": "^7.2.0",
     "@react-navigation/native": "^7.0.14",
     "@react-navigation/stack": "^7.1.1",
-    "expo": "~52.0.33",
+    "body-parser": "^1.20.3",
+    "cors": "^2.8.5",
+    "expo": "~52.0.36",
+    "expo-asset": "~11.0.4",
     "expo-blur": "~14.0.3",
+    "expo-file-system": "~18.0.11",
     "expo-image-picker": "^16.0.6",
     "expo-status-bar": "~2.0.1",
+    "express": "^4.21.2",
+    "fs": "^0.0.1-security",
     "react": "18.3.1",
     "react-native": "0.76.7",
     "react-native-fs": "^2.20.0",
@@ -30,8 +36,12 @@
   "devDependencies": {
     "@babel/core": "^7.25.2",
     "@types/react": "~18.3.12",
+    "@types/react-native-fs": "^2.8.3",
     "@types/react-native-vector-icons": "^6.4.18",
     "typescript": "^5.3.3"
   },
-  "private": true
+  "private": true,
+  "keywords": [],
+  "author": "",
+  "description": ""
 }

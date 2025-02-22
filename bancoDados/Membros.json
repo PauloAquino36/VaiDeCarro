@@ -1,0 +1,55 @@
+{
+    "membros": [
+      {
+        "id": 1,
+        "nome": "Carlos Silva",
+        "cargo": "Gerente",
+        "telefone": "(11) 91234-5678",
+        "email": "carlos.silva@aluguelcar.com",
+        "foto": "fotoMembros.png",
+        "senha": "123456",
+        "cpf": "123.456.789-00"
+      },
+      {
+        "id": 2,
+        "nome": "Ana Souza",
+        "cargo": "Atendente",
+        "telefone": "(11) 98765-4321",
+        "email": "ana.souza@aluguelcar.com",
+        "foto": "ana.jpg",
+        "senha": "654321",
+        "cpf": "987.654.321-00"
+      },
+      {
+        "id": 3,
+        "nome": "Fernando Oliveira",
+        "cargo": "Mecânico",
+        "telefone": "(11) 97654-3210",
+        "email": "fernando.oliveira@aluguelcar.com",
+        "foto": "fernando.jpg",
+        "senha": "321654",
+        "cpf": "654.321.987-00"
+      },
+      {
+        "id": 4,
+        "nome": "Mariana Lima",
+        "cargo": "Recepcionista",
+        "telefone": "(11) 96543-2109",
+        "email": "mariana.lima@aluguelcar.com",
+        "foto": "mariana.jpg",
+        "senha": "456789",
+        "cpf": "456.789.123-00"
+      },
+      {
+        "id": 5,
+        "nome": "João Pereira S",
+        "cargo": "Motorista",
+        "telefone": "(11) 95432-1098",
+        "email": "joao.pereira@aluguelcar.com",
+        "foto": "joao.jpg",
+        "senha": "987654",
+        "cpf": "789.123.456-00"
+      }
+    ]
+  }
+  
