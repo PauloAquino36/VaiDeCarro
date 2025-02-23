@@ -1,14 +1,24 @@
-import React, { useState } from 'react';
-import { View, TextInput, Image, StyleSheet, Dimensions, TouchableOpacity, Text, Modal } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, TextInput, Image, StyleSheet, Dimensions, TouchableOpacity, Text, Modal, Alert } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import Navbar from '../Componentes/NavBar';
 import MembrosCrud from '../Componentes/MembrosCrud';
 
 const { width } = Dimensions.get('window');
 
+interface Membro {
+  cargo: string;
+  nome: string;
+  email: string;
+  senha: string;
+  numero: string;
+  cpf: string;
+}
+
 const Membros = () => {
   const [modalVisible, setModalVisible] = useState(false);
-  const [novoMembro, setNovoMembro] = useState({
+  const [membros, setMembros] = useState<Membro[]>([]);
+  const [novoMembro, setNovoMembro] = useState<Membro>({
     cargo: '',
     nome: '',
     email: '',
@@ -17,30 +27,45 @@ const Membros = () => {
     cpf: '',
   });
 
-interface Membro {
-    cargo: string;
-    nome: string;
-    email: string;
-    senha: string;
-    numero: string;
-    cpf: string;
-}
-
-const handleInputChange = (key: keyof Membro, value: string) => {
-    setNovoMembro({ ...novoMembro, [key]: value });
-};
+  const handleInputChange = (key: keyof Membro, value: string) => {
+    setNovoMembro((prevMembro) => ({
+      ...prevMembro,
+      [key]: value,
+    }));
+  };
 
   const adicionarMembro = () => {
-    console.log('Novo membro adicionado:', novoMembro);
+    if (!novoMembro.nome || !novoMembro.email) {
+      Alert.alert('Erro', 'Preencha pelo menos Nome e Email');
+      return;
+    }
+
+    setMembros((prevMembros) => [...prevMembros, novoMembro]);
+    
+
+    setNovoMembro({ // Resetando o formulário
+      cargo: '',
+      nome: '',
+      email: '',
+      senha: '',
+      numero: '',
+      cpf: '',
+    });
+
     setModalVisible(false);
   };
+
+  // Monitora mudanças no estado `membros`
+  useEffect(() => {
+    console.log('Lista de membros atualizada:', membros);
+  }, [membros]);
 
   return (
     <View style={styles.container}>
       <Image source={require('../assets/Imgs/VaiDeCarro_logo.png')} style={styles.logo} />
 
       <View style={styles.searchContainer}>
-        <Icon name="search" size={width * 0.05} color="#38B6FF" style={styles.icon} />
+        <Icon name="search" size={20} color="#38B6FF" style={styles.icon} />
         <TextInput 
           style={styles.searchBar} 
           placeholder="Pesquisar..." 
@@ -48,24 +73,60 @@ const handleInputChange = (key: keyof Membro, value: string) => {
         />
       </View>
 
+      
+
       <TouchableOpacity style={styles.botao} onPress={() => setModalVisible(true)}>
-        <Icon name="plus" size={width * 0.05} color="#38B6FF" style={styles.icon} />
+        <Icon name="plus" size={20} color="#38B6FF" style={styles.icon} />
         <Text style={styles.textoBtn}>Adicionar Membro</Text>
       </TouchableOpacity>
 
-        <MembrosCrud />
+      <MembrosCrud membros={membros} setMembros={setMembros} />
 
       <Modal animationType="slide" transparent={true} visible={modalVisible}>
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
             <Text style={styles.modalTitle}>Adicionar Membro</Text>
 
-            <TextInput style={styles.input} placeholder="Cargo" onChangeText={(value) => handleInputChange('cargo', value)} />
-            <TextInput style={styles.input} placeholder="Nome" onChangeText={(value) => handleInputChange('nome', value)} />
-            <TextInput style={styles.input} placeholder="Email" keyboardType="email-address" onChangeText={(value) => handleInputChange('email', value)} />
-            <TextInput style={styles.input} placeholder="Senha" secureTextEntry onChangeText={(value) => handleInputChange('senha', value)} />
-            <TextInput style={styles.input} placeholder="Número" keyboardType="phone-pad" onChangeText={(value) => handleInputChange('numero', value)} />
-            <TextInput style={styles.input} placeholder="CPF" keyboardType="numeric" onChangeText={(value) => handleInputChange('cpf', value)} />
+            <TextInput 
+              style={styles.input} 
+              placeholder="Cargo" 
+              value={novoMembro.cargo}
+              onChangeText={(value) => handleInputChange('cargo', value)}
+            />
+            <TextInput 
+              style={styles.input} 
+              placeholder="Nome" 
+              value={novoMembro.nome}
+              onChangeText={(value) => handleInputChange('nome', value)}
+            />
+            <TextInput 
+              style={styles.input} 
+              placeholder="Email" 
+              keyboardType="email-address"
+              value={novoMembro.email}
+              onChangeText={(value) => handleInputChange('email', value)}
+            />
+            <TextInput 
+              style={styles.input} 
+              placeholder="Senha" 
+              secureTextEntry
+              value={novoMembro.senha}
+              onChangeText={(value) => handleInputChange('senha', value)}
+            />
+            <TextInput 
+              style={styles.input} 
+              placeholder="Número" 
+              keyboardType="phone-pad"
+              value={novoMembro.numero}
+              onChangeText={(value) => handleInputChange('numero', value)}
+            />
+            <TextInput 
+              style={styles.input} 
+              placeholder="CPF" 
+              keyboardType="numeric"
+              value={novoMembro.cpf}
+              onChangeText={(value) => handleInputChange('cpf', value)}
+            />
 
             <View style={styles.modalButtons}>
               <TouchableOpacity style={styles.modalButton} onPress={() => setModalVisible(false)}>
@@ -83,6 +144,7 @@ const handleInputChange = (key: keyof Membro, value: string) => {
     </View>
   );
 };
+
 
 const styles = StyleSheet.create({
   container: {

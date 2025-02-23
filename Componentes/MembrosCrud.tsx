@@ -8,7 +8,6 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 interface Membro {
   id: number;
   nome: string;
-  idade: number;
   cargo: string;
   telefone: string;
   email: string;
@@ -19,48 +18,49 @@ interface Membro {
 
 const { width } = Dimensions.get('window');
 
-const MembrosCrud = () => {
-  const [membros, setMembros] = useState<Membro[]>([]);
+interface MembrosCrudProps {
+  membros: Membro[];
+}
+
+const MembrosCrud: React.FC<MembrosCrudProps> = ({ membros, setMembros }) => {
   const [showModal, setShowModal] = useState<boolean>(false);
   const [showEditModal, setShowEditModal] = useState<boolean>(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState<boolean>(false);
   const [selectedMembro, setSelectedMembro] = useState<Membro | null>(null);
   const [editedName, setEditedName] = useState<string>('');
   const [editedEmail, setEditedEmail] = useState<string>('');
-const [editedSenha, setEditedSenha] = useState<string>('');
-const [editedTelefone, setEditedTelefone] = useState<string>('');
-const [editedCpf, setEditedCpf] = useState<string>('');
-const [editedCargo, setEditedCargo] = useState<string>('');
+  const [editedSenha, setEditedSenha] = useState<string>('');
+  const [editedTelefone, setEditedTelefone] = useState<string>('');
+  const [editedCpf, setEditedCpf] = useState<string>('');
+  const [editedCargo, setEditedCargo] = useState<string>('');
 
-
-useEffect(() => {
-  const carregarMembros = async () => {
-    try {
-      const jsonValue = await AsyncStorage.getItem('@membros');
-      if (jsonValue !== null) {
-        setMembros(JSON.parse(jsonValue));
-      } else {
-        setMembros(membrosData.membros); // Se não houver dados, usar o JSON inicial
-        await AsyncStorage.setItem('@membros', JSON.stringify(membrosData.membros));
+  useEffect(() => {
+    const carregarMembros = async () => {
+      try {
+        const jsonValue = await AsyncStorage.getItem('@membros');
+        if (jsonValue !== null) {
+          setMembros(JSON.parse(jsonValue));
+        } else {
+          // Carregar dados iniciais se não houver membros
+          setMembros(membrosData.membros);
+          await AsyncStorage.setItem('@membros', JSON.stringify(membrosData.membros));
+        }
+      } catch (error) {
+        console.error('Erro ao carregar membros:', error);
       }
-    } catch (error) {
-      console.error('Erro ao carregar membros:', error);
-    }
-  };
+    };
 
-  carregarMembros();
-}, []);
+    carregarMembros();
+  }, [setMembros]);
 
-  //Apagar
   const salvarMembros = async (novosMembros: Membro[]) => {
     try {
       await AsyncStorage.setItem('@membros', JSON.stringify(novosMembros));
-      setMembros(novosMembros);
+      setMembros(novosMembros); // Atualiza a lista de membros no componente pai
     } catch (error) {
       console.error('Erro ao salvar membros:', error);
     }
   };
-  
 
   const handleView = (membro: Membro) => {
     setSelectedMembro(membro);
@@ -69,7 +69,7 @@ useEffect(() => {
 
   const handleEdit = (membro: Membro) => {
     setSelectedMembro(membro);
-    setEditedName(membro.nome); // Preenche o campo de edição com o nome do membro
+    setEditedName(membro.nome);
     setEditedEmail(membro.email);
     setEditedTelefone(membro.telefone);
     setEditedCpf(membro.cpf);
@@ -85,38 +85,26 @@ useEffect(() => {
 
   const confirmDelete = async () => {
     if (selectedMembro) {
-      try {
-        const novosMembros = membros.filter(membro => membro.id !== selectedMembro.id);
-        await salvarMembros(novosMembros);
-        setShowDeleteConfirm(false);
-        Alert.alert('Membro deletado com sucesso!');
-      } catch (error) {
-        Alert.alert('Erro ao excluir o membro!');
-      }
+      const novosMembros = membros.filter(membro => membro.id !== selectedMembro.id);
+      await salvarMembros(novosMembros);
+      setShowDeleteConfirm(false);
+      Alert.alert('Membro deletado com sucesso!');
     }
   };
-  
-  
 
   const handleSaveEdit = async () => {
     if (selectedMembro) {
-      try {
-        const novosMembros = membros.map(membro =>
-          membro.id === selectedMembro.id
-            ? { ...membro, nome: editedName, email: editedEmail, telefone: editedTelefone, cpf: editedCpf, cargo: editedCargo, senha: editedSenha }
-            : membro
-        );
-  
-        await salvarMembros(novosMembros);
-        setShowEditModal(false);
-        Alert.alert('Membro editado com sucesso!');
-      } catch (error) {
-        console.error('Erro ao editar o membro:', error);
-        Alert.alert('Erro ao editar o membro!');
-      }
+      const novosMembros = membros.map(membro =>
+        membro.id === selectedMembro.id
+          ? { ...membro, nome: editedName, email: editedEmail, telefone: editedTelefone, cpf: editedCpf, cargo: editedCargo, senha: editedSenha }
+          : membro
+      );
+
+      await salvarMembros(novosMembros);
+      setShowEditModal(false);
+      Alert.alert('Membro editado com sucesso!');
     }
   };
-  
 
   if (membros.length === 0) {
     return <Text style={styles.texto}>Carregando...</Text>;
@@ -129,18 +117,15 @@ useEffect(() => {
           <Image source={require("../bancoDados/Membros/fotoMembros.png")} style={styles.membro} />
           <View style={styles.info}>
             <Text style={styles.texto}>{membro.nome}</Text>
-
             <View style={styles.botoesContainer}>
               <TouchableOpacity style={styles.botao} onPress={() => handleView(membro)}>
                 <Icon name="eye" size={width * 0.05} color={"#38B6FF"} />
                 <Text style={styles.textoBtn}>Ver</Text>
               </TouchableOpacity>
-
               <TouchableOpacity style={styles.botao} onPress={() => handleEdit(membro)}>
                 <Icon name="pencil" size={width * 0.05} color={"#38B6FF"} />
                 <Text style={styles.textoBtn}>Editar</Text>
               </TouchableOpacity>
-
               <TouchableOpacity style={styles.botao} onPress={() => handleDelete(membro)}>
                 <Icon name="trash" size={width * 0.05} color={"#38B6FF"} />
                 <Text style={styles.textoBtn}>Deletar</Text>
@@ -155,20 +140,19 @@ useEffect(() => {
         <Modal visible={showModal} animationType="slide" transparent={true} onRequestClose={() => setShowModal(false)}>
           <View style={styles.modalContainer}>
             <View style={styles.modalContent}>
-                <View style={styles.modalContentText}>
-                    <Text style={styles.modalTitle}>Membro: {selectedMembro.nome}</Text>
-                    <Text style={styles.modalText}>Cargo: {selectedMembro.cargo}</Text>
-                    <Text style={styles.modalText}>Email: {selectedMembro.email}</Text>
-                    <Text style={styles.modalText}>Número: {selectedMembro.telefone}</Text>
-                    <Text style={styles.modalText}>CPF: {selectedMembro.cpf}</Text>
-                    
-              <TouchableOpacity style={styles.closeBtn} onPress={() => setShowModal(false)}>
-                <Text style={styles.closeText}>Fechar</Text>
-              </TouchableOpacity>
-                </View>
-                <View>
-                    <Image source={require("../bancoDados/Membros/fotoMembros.png")} style={styles.modalImage} />
-                </View>
+              <View style={styles.modalContentText}>
+                <Text style={styles.modalTitle}>Membro: {selectedMembro.nome}</Text>
+                <Text style={styles.modalText}>Cargo: {selectedMembro.cargo}</Text>
+                <Text style={styles.modalText}>Email: {selectedMembro.email}</Text>
+                <Text style={styles.modalText}>Número: {selectedMembro.telefone}</Text>
+                <Text style={styles.modalText}>CPF: {selectedMembro.cpf}</Text>
+                <TouchableOpacity style={styles.closeBtn} onPress={() => setShowModal(false)}>
+                  <Text style={styles.closeText}>Fechar</Text>
+                </TouchableOpacity>
+              </View>
+              <View>
+                <Image source={require("../bancoDados/Membros/fotoMembros.png")} style={styles.modalImage} />
+              </View>
             </View>
           </View>
         </Modal>
@@ -181,48 +165,17 @@ useEffect(() => {
             <View style={styles.modalContentEdit}>
               <Text style={styles.modalTitle}>Editar Membro</Text>
               <Text style={styles.modalTextInput}>Nome:</Text>
-              <TextInput
-                style={styles.input}
-                value={editedName}
-                onChangeText={setEditedName}
-                placeholder="Digite o novo nome"
-              />
+              <TextInput style={styles.input} value={editedName} onChangeText={setEditedName} placeholder="Digite o novo nome" />
               <Text style={styles.modalTextInput}>Email:</Text>
-                <TextInput
-                    style={styles.input}
-                    value={editedEmail}
-                    onChangeText={setEditedEmail}
-                    placeholder="Digite o novo email"
-                />
-                <Text style={styles.modalTextInput}>Senha:</Text>
-                <TextInput
-                    style={styles.input}
-                    value={editedSenha}
-                    onChangeText={setEditedSenha}
-                    placeholder="Digite a nova senha"
-                />
-                <Text style={styles.modalTextInput}>Telefone:</Text>
-                <TextInput
-                    style={styles.input}
-                    value={editedTelefone}
-                    onChangeText={setEditedTelefone}
-                    placeholder="Digite o novo telefone"
-                />
-                <Text style={styles.modalTextInput}>CPF:</Text>
-                <TextInput
-                    style={styles.input}
-                    value={editedCpf}
-                    onChangeText={setEditedCpf}
-                    placeholder="Digite o novo CPF"
-                />
-                <Text style={styles.modalTextInput}>Cargo:</Text>
-                <TextInput
-                    style={styles.input}
-                    value={editedCargo}
-                    onChangeText={setEditedCargo}
-                    placeholder="Digite o novo cargo"
-                />
-
+              <TextInput style={styles.input} value={editedEmail} onChangeText={setEditedEmail} placeholder="Digite o novo email" />
+              <Text style={styles.modalTextInput}>Senha:</Text>
+              <TextInput style={styles.input} value={editedSenha} onChangeText={setEditedSenha} placeholder="Digite a nova senha" />
+              <Text style={styles.modalTextInput}>Telefone:</Text>
+              <TextInput style={styles.input} value={editedTelefone} onChangeText={setEditedTelefone} placeholder="Digite o novo telefone" />
+              <Text style={styles.modalTextInput}>CPF:</Text>
+              <TextInput style={styles.input} value={editedCpf} onChangeText={setEditedCpf} placeholder="Digite o novo CPF" />
+              <Text style={styles.modalTextInput}>Cargo:</Text>
+              <TextInput style={styles.input} value={editedCargo} onChangeText={setEditedCargo} placeholder="Digite o novo cargo" />
               <TouchableOpacity style={styles.saveBtn} onPress={handleSaveEdit}>
                 <Text style={styles.closeText}>Salvar</Text>
               </TouchableOpacity>
@@ -253,6 +206,7 @@ useEffect(() => {
     </ScrollView>
   );
 };
+
 
 const styles = StyleSheet.create({
   scrollContainer: {
