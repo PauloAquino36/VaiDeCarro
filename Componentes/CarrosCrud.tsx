@@ -31,6 +31,15 @@ const CarrosCrud: React.FC<CarrosCrudProps> = ({ carros, setCarros }) => {
   const [editedConsumo, setEditedConsumo] = useState<number>(0);
   const [editedPlaca, setEditedPlaca] = useState<string>('');
   const [editedStatus, setEditedStatus] = useState<string>('disponível');
+  const [showRentModal, setShowRentModal] = useState<boolean>(false);
+const [nomeCliente, setNomeCliente] = useState<string>('');
+const [telefoneCliente, setTelefoneCliente] = useState<string>('');
+const [cpfCliente, setCpfCliente] = useState<string>('');
+const [enderecoCliente, setEnderecoCliente] = useState<string>('');
+const [dataNascimentoCliente, setDataNascimentoCliente] = useState<string>('');
+const [horaInicioAluguel, setHoraInicioAluguel] = useState<string>('');
+const [horaTerminoAluguel, setHoraTerminoAluguel] = useState<string>('');
+
 
   // Carregar carros do AsyncStorage ou do JSON inicial
   useEffect(() => {
@@ -100,6 +109,15 @@ const CarrosCrud: React.FC<CarrosCrudProps> = ({ carros, setCarros }) => {
     }
   };
 
+  const handleRent = (carro: Carro) => {
+    setSelectedCarro(carro);
+    // Definir a hora de início como a hora atual
+    const horaAtual = new Date().toISOString();  // Pegando a hora atual no formato ISO
+    setHoraInicioAluguel(horaAtual);  // Atualiza o estado com a hora atual
+    setShowRentModal(true);
+  };
+  
+
   if (carros.length === 0) {
     return <Text style={styles.texto}>Carregando...</Text>;
   }
@@ -112,7 +130,7 @@ const CarrosCrud: React.FC<CarrosCrudProps> = ({ carros, setCarros }) => {
           <View style={styles.info}>
             <Text style={styles.texto}>{carro.nome} - {carro.ano}</Text>
 
-            <TouchableOpacity style={styles.botao} disabled={carro.status === 'indisponível'}>
+            <TouchableOpacity style={styles.botao} disabled={carro.status === 'indisponível'} onPress={() => handleRent(carro)}>
               <Icon name="user-plus" size={width * 0.05} color={carro.status === 'disponível' ? "#38B6FF" : "gray"} />
               <Text style={styles.textoBtn}>{carro.status === 'disponível' ? 'Alugar' : 'Indisponível'}</Text>
             </TouchableOpacity>
@@ -213,7 +231,65 @@ const CarrosCrud: React.FC<CarrosCrudProps> = ({ carros, setCarros }) => {
             </View>
           </View>
         </Modal>
+
+        
       )}
+
+      {/* Modal para aluguel */}
+    {showRentModal && (
+      <Modal visible={showRentModal} animationType="slide" transparent={true} onRequestClose={() => setShowRentModal(false)}>
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>Alugar Carro</Text>
+            <TextInput
+              style={styles.input}
+              value={nomeCliente}
+              onChangeText={setNomeCliente}
+              placeholder="Nome do Cliente"
+            />
+            <TextInput
+              style={styles.input}
+              value={telefoneCliente}
+              onChangeText={setTelefoneCliente}
+              placeholder="Telefone do Cliente"
+            />
+            <TextInput
+              style={styles.input}
+              value={cpfCliente}
+              onChangeText={setCpfCliente}
+              placeholder="CPF do Cliente"
+            />
+            <TextInput
+              style={styles.input}
+              value={enderecoCliente}
+              onChangeText={setEnderecoCliente}
+              placeholder="Endereço do Cliente"
+            />
+            <TextInput
+              style={styles.input}
+              value={dataNascimentoCliente}
+              onChangeText={setDataNascimentoCliente}
+              placeholder="Data de Nascimento (YYYY-MM-DD)"
+            />
+            <TextInput
+              style={styles.input}
+              value={horaTerminoAluguel}
+              onChangeText={setHoraTerminoAluguel}
+              placeholder="Hora de Término (YYYY-MM-DDTHH:mm:ss)"
+            />
+
+            <TouchableOpacity style={styles.saveBtn} onPress={() => { /* Lógica para salvar aluguel */ }}>
+              <Text style={styles.closeText}>Confirmar Aluguel</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.closeBtn} onPress={() => setShowRentModal(false)}>
+              <Text style={styles.closeText}>Cancelar</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+    )}
+
+      
     </ScrollView>
   );
 };
@@ -276,13 +352,10 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
   modalContent: {
-    backgroundColor: 'white',
+    width: width * 0.9,
     padding: 20,
+    backgroundColor: 'white',
     borderRadius: 10,
-    width: width * 0.8,
-    flexDirection: 'row', // Adicionando essa linha para colocar as views lado a lado
-    justifyContent: 'space-between', // Distribui o espaço entre as views
-    alignItems: 'center', // Alinha as views ao centro verticalmente
   },
   modalTitle: {
     fontSize: width * 0.05,
