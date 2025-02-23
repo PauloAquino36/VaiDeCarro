@@ -15,6 +15,7 @@ interface Carro {
   foto?: string;
   preco_por_hora?: string;
   consumo_por_litro?: string;
+  status?: string;
 }
 
 const Carros = () => {
@@ -39,6 +40,8 @@ const Carros = () => {
       Alert.alert('Erro', 'Preencha pelo menos Nome e Placa');
       return;
     }
+
+    novoCarro.status = 'disponível';
   
     const novosCarros = [...carros, novoCarro];
   

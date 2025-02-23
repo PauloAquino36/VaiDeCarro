@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from 'react'; 
-import { Text, TouchableOpacity, StyleSheet, Dimensions, View, Image, ScrollView, Modal, TextInput, Alert } from 'react-native';
+import { Text, TouchableOpacity, StyleSheet, Dimensions, View, Image, ScrollView, Modal, TextInput, Alert, Switch } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import carrosData from '../bancoDados/Dados/Carros.json';
+import DateTimePickerModal from "react-native-modal-datetime-picker";
+
 
 const { width } = Dimensions.get('window');
 
@@ -14,6 +16,21 @@ interface Carro {
   placa: string;
   status: string;
   foto: string;
+}
+
+interface Cliente {
+  nome: string;
+  telefone: string;
+  cpf: string;
+  endereco: string;
+  dataNascimento: string;
+}
+
+interface Aluguel {
+  carro: Carro;
+  cliente: Cliente;
+  horaInicio: string;
+  horaTermino: string;
 }
 
 interface CarrosCrudProps {
@@ -32,13 +49,17 @@ const CarrosCrud: React.FC<CarrosCrudProps> = ({ carros, setCarros }) => {
   const [editedPlaca, setEditedPlaca] = useState<string>('');
   const [editedStatus, setEditedStatus] = useState<string>('disponível');
   const [showRentModal, setShowRentModal] = useState<boolean>(false);
+  const [isDisponivel, setIsDisponivel] = useState<boolean>(true);
 const [nomeCliente, setNomeCliente] = useState<string>('');
 const [telefoneCliente, setTelefoneCliente] = useState<string>('');
 const [cpfCliente, setCpfCliente] = useState<string>('');
 const [enderecoCliente, setEnderecoCliente] = useState<string>('');
-const [dataNascimentoCliente, setDataNascimentoCliente] = useState<string>('');
-const [horaInicioAluguel, setHoraInicioAluguel] = useState<string>('');
-const [horaTerminoAluguel, setHoraTerminoAluguel] = useState<string>('');
+const [dataNascimentoCliente, setDataNascimentoCliente] = useState('');
+  const [horaTerminoAluguel, setHoraTerminoAluguel] = useState(new Date());
+  const [horaInicioAluguel, setHoraInicioAluguel] = useState(new Date().toISOString());
+  const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
+
+const [aluguéis, setAlugueis] = useState<Aluguel[]>([]);
 
 
   // Carregar carros do AsyncStorage ou do JSON inicial
@@ -92,22 +113,23 @@ const [horaTerminoAluguel, setHoraTerminoAluguel] = useState<string>('');
     setEditedConsumo(carro.consumo_por_litro);
     setEditedPlaca(carro.placa);
     setEditedStatus(carro.status);
+    setIsDisponivel(carro.status === 'disponível');
     setShowEditModal(true);
   };
 
   // Salvar edição
-  const handleSaveEdit = () => {
-    if (selectedCarro) {
-      const novosCarros = carros.map(carro =>
-        carro.placa === selectedCarro.placa
-          ? { ...carro, nome: editedNome, ano: editedAno, preco_por_hora: editedPreco, consumo_por_litro: editedConsumo, placa: editedPlaca, status: editedStatus }
-          : carro
-      );
-      salvarCarros(novosCarros);
-      setShowEditModal(false);
-      Alert.alert('Carro editado com sucesso!');
-    }
-  };
+const handleSaveEdit = () => {
+  if (selectedCarro) {
+    const novosCarros = carros.map(carro =>
+      carro.placa === selectedCarro.placa
+        ? { ...carro, nome: editedNome, ano: editedAno, preco_por_hora: editedPreco, consumo_por_litro: editedConsumo, placa: editedPlaca, status: isDisponivel ? 'disponível' : 'indisponível' } // Atualiza o status baseado no switch
+        : carro
+    );
+    salvarCarros(novosCarros);
+    setShowEditModal(false);
+    Alert.alert('Carro editado com sucesso!');
+  }
+};
 
   const handleRent = (carro: Carro) => {
     setSelectedCarro(carro);
@@ -116,6 +138,69 @@ const [horaTerminoAluguel, setHoraTerminoAluguel] = useState<string>('');
     setHoraInicioAluguel(horaAtual);  // Atualiza o estado com a hora atual
     setShowRentModal(true);
   };
+
+  const handleConfirmRent = () => {
+    if (selectedCarro) {
+      const novoAluguel: Aluguel = {
+        carro: selectedCarro,
+        cliente: {
+          nome: nomeCliente,
+          telefone: telefoneCliente,
+          cpf: cpfCliente,
+          endereco: enderecoCliente,
+          dataNascimento: dataNascimentoCliente,
+        },
+        horaInicio: horaInicioAluguel,
+        horaTermino: horaTerminoAluguel.toISOString(),
+      };
+  
+      const novosAlugueis = [...aluguéis, novoAluguel];
+      salvarAlugueis(novosAlugueis);
+  
+      const novosCarros = carros.map(carro =>
+        carro.placa === selectedCarro.placa
+          ? { ...carro, status: 'indisponível' }
+          : carro
+      );
+      salvarCarros(novosCarros);
+  
+      setShowRentModal(false);
+      Alert.alert('Aluguel registrado com sucesso!');
+    }
+  };
+
+  const salvarAlugueis = async (novosAlugueis: Aluguel[]) => {
+    try {
+      await AsyncStorage.setItem('@aluguéis', JSON.stringify(novosAlugueis));
+      setAlugueis(novosAlugueis);
+    } catch (error) {
+      console.error('Erro ao salvar aluguéis:', error);
+    }
+  };
+
+  interface DateTimePickerEvent {
+    type: string;
+    nativeEvent: any;
+  }
+
+
+  const showDatePicker = () => {
+    setDatePickerVisibility(true);
+  };
+  
+  const hideDatePicker = () => {
+    setDatePickerVisibility(false);
+  };
+  
+  interface HandleConfirm {
+    (date: Date): void;
+  }
+
+  const handleConfirm: HandleConfirm = (date) => {
+    setHoraTerminoAluguel(date);
+    hideDatePicker();
+  };
+  
   
 
   if (carros.length === 0) {
@@ -178,115 +263,133 @@ const [horaTerminoAluguel, setHoraTerminoAluguel] = useState<string>('');
 
       {/* Modal para editar carro */}
       {selectedCarro && (
-        <Modal visible={showEditModal} animationType="slide" transparent={true} onRequestClose={() => setShowEditModal(false)}>
-          <View style={styles.modalContainer}>
-            <View style={styles.modalContent}>
-              <Text style={styles.modalTitle}>Editar Carro</Text>
-              <TextInput
-                style={styles.input}
-                value={editedNome}
-                onChangeText={setEditedNome}
-                placeholder="Nome"
-              />
-              <TextInput
-                style={styles.input}
-                value={editedAno.toString()}
-                onChangeText={text => setEditedAno(Number(text))}
-                placeholder="Ano"
-                keyboardType="numeric"
-              />
-              <TextInput
-                style={styles.input}
-                value={editedPreco.toString()}
-                onChangeText={text => setEditedPreco(Number(text))}
-                placeholder="Preço por Hora"
-                keyboardType="numeric"
-              />
-              <TextInput
-                style={styles.input}
-                value={editedConsumo.toString()}
-                onChangeText={text => setEditedConsumo(Number(text))}
-                placeholder="Consumo por Litro"
-                keyboardType="numeric"
-              />
-              <TextInput
-                style={styles.input}
-                value={editedPlaca}
-                onChangeText={setEditedPlaca}
-                placeholder="Placa"
-              />
-              <TextInput
-                style={styles.input}
-                value={editedStatus}
-                onChangeText={setEditedStatus}
-                placeholder="Status (disponível/indisponível)"
-              />
-
-              <TouchableOpacity style={styles.saveBtn} onPress={handleSaveEdit}>
-                <Text style={styles.closeText}>Salvar</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.closeBtn} onPress={() => setShowEditModal(false)}>
-                <Text style={styles.closeText}>Cancelar</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        </Modal>
-
-        
-      )}
-
-      {/* Modal para aluguel */}
-    {showRentModal && (
-      <Modal visible={showRentModal} animationType="slide" transparent={true} onRequestClose={() => setShowRentModal(false)}>
+      <Modal
+        visible={showEditModal}
+        animationType="slide"
+        transparent={true}
+        onRequestClose={() => setShowEditModal(false)}
+      >
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>Alugar Carro</Text>
+            <Text style={styles.modalTitle}>Editar Carro</Text>
             <TextInput
               style={styles.input}
-              value={nomeCliente}
-              onChangeText={setNomeCliente}
-              placeholder="Nome do Cliente"
+              value={editedNome}
+              onChangeText={setEditedNome}
+              placeholder="Nome"
             />
             <TextInput
               style={styles.input}
-              value={telefoneCliente}
-              onChangeText={setTelefoneCliente}
-              placeholder="Telefone do Cliente"
+              value={editedAno.toString()}
+              onChangeText={text => setEditedAno(Number(text))}
+              placeholder="Ano"
+              keyboardType="numeric"
             />
             <TextInput
               style={styles.input}
-              value={cpfCliente}
-              onChangeText={setCpfCliente}
-              placeholder="CPF do Cliente"
+              value={editedPreco.toString()}
+              onChangeText={text => setEditedPreco(Number(text))}
+              placeholder="Preço por Hora"
+              keyboardType="numeric"
             />
             <TextInput
               style={styles.input}
-              value={enderecoCliente}
-              onChangeText={setEnderecoCliente}
-              placeholder="Endereço do Cliente"
+              value={editedConsumo.toString()}
+              onChangeText={text => setEditedConsumo(Number(text))}
+              placeholder="Consumo por Litro"
+              keyboardType="numeric"
             />
             <TextInput
               style={styles.input}
-              value={dataNascimentoCliente}
-              onChangeText={setDataNascimentoCliente}
-              placeholder="Data de Nascimento (YYYY-MM-DD)"
-            />
-            <TextInput
-              style={styles.input}
-              value={horaTerminoAluguel}
-              onChangeText={setHoraTerminoAluguel}
-              placeholder="Hora de Término (YYYY-MM-DDTHH:mm:ss)"
+              value={editedPlaca}
+              onChangeText={setEditedPlaca}
+              placeholder="Placa"
             />
 
-            <TouchableOpacity style={styles.saveBtn} onPress={() => { /* Lógica para salvar aluguel */ }}>
-              <Text style={styles.closeText}>Confirmar Aluguel</Text>
+            <View style={styles.switchContainer}>
+              <Text style={styles.switchLabel}>Disponível</Text>
+              <Switch
+                value={isDisponivel}
+                onValueChange={(value) => {
+                  setIsDisponivel(value);
+                  setEditedStatus(value ? 'disponível' : 'indisponível'); // Atualiza o status editado com base no switch
+                }}
+              />
+            </View>
+
+            <TouchableOpacity style={styles.saveBtn} onPress={handleSaveEdit}>
+              <Text style={styles.closeText}>Salvar</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.closeBtn} onPress={() => setShowRentModal(false)}>
+            <TouchableOpacity style={styles.closeBtn} onPress={() => setShowEditModal(false)}>
               <Text style={styles.closeText}>Cancelar</Text>
             </TouchableOpacity>
           </View>
         </View>
       </Modal>
+    )}
+
+      {/* Modal para aluguel */}
+    {showRentModal && (
+      <Modal visible={showRentModal} animationType="slide" transparent={true} onRequestClose={() => setShowRentModal(false)}>
+      <View style={styles.modalContainer}>
+        <View style={styles.modalContent}>
+          <Text style={styles.modalTitle}>Alugar Carro</Text>
+          <TextInput
+            style={styles.input}
+            value={nomeCliente}
+            onChangeText={setNomeCliente}
+            placeholder="Nome do Cliente"
+          />
+          <TextInput
+            style={styles.input}
+            value={telefoneCliente}
+            onChangeText={setTelefoneCliente}
+            placeholder="Telefone do Cliente"
+          />
+          <TextInput
+            style={styles.input}
+            value={cpfCliente}
+            onChangeText={setCpfCliente}
+            placeholder="CPF do Cliente"
+          />
+          <TextInput
+            style={styles.input}
+            value={enderecoCliente}
+            onChangeText={setEnderecoCliente}
+            placeholder="Endereço do Cliente"
+          />
+          <TextInput
+            style={styles.input}
+            value={dataNascimentoCliente}
+            onChangeText={setDataNascimentoCliente}
+            placeholder="Data de Nascimento (YYYY-MM-DD)"
+          />
+
+          {/* Botão para abrir o DateTimePicker */}
+        <TouchableOpacity onPress={showDatePicker} style={styles.dateButton}>
+          <Text style={styles.dateButtonText}>{`Hora de Término: ${horaTerminoAluguel.toLocaleString()}`}</Text>
+        </TouchableOpacity>
+
+        {isDatePickerVisible && (
+          <DateTimePickerModal
+          isVisible={isDatePickerVisible}
+          mode="datetime"
+          date={horaTerminoAluguel}
+          onConfirm={handleConfirm}
+          onCancel={hideDatePicker}
+          minimumDate={new Date()}
+        />
+        )}
+
+          <TouchableOpacity style={styles.saveBtn} onPress={handleConfirmRent}>
+            <Text style={styles.closeText}>Confirmar Aluguel</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.closeBtn} onPress={() => setShowRentModal(false)}>
+            <Text style={styles.closeText}>Cancelar</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    </Modal>
     )}
 
       
@@ -389,6 +492,25 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   closeText: {
+    color: 'white',
+    fontWeight: 'bold',
+  },
+  switchContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 15,
+  },
+  switchLabel: {
+    marginRight: 10,
+  },
+  dateButton: {
+    marginBottom: 15,
+    padding: 10,
+    backgroundColor: '#38B6FF',
+    borderRadius: 5,
+    alignItems: 'center',
+  },
+  dateButtonText: {
     color: 'white',
     fontWeight: 'bold',
   },
