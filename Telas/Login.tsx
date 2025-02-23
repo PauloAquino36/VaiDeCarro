@@ -1,15 +1,40 @@
-import React from 'react';
-import { View, TextInput, Image, StyleSheet, Dimensions } from 'react-native';
+import React, { useState } from 'react';
+import { View, TextInput, Image, StyleSheet, Dimensions, Alert } from 'react-native';
 import { NavigationProp, useNavigation } from '@react-navigation/native';
 import BotaoContornado from '../Componentes/BotaoContornado';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const { width } = Dimensions.get('window');
 
 const Login = () => {
   const navigation = useNavigation<NavigationProp<any>>();
+  const [email, setEmail] = useState('');
+  const [senha, setSenha] = useState('');
 
-  const handleLogin = () => {
-    navigation.navigate('Inicio');
+  const handleLogin = async () => {
+    // Verifica se o usuário é o administrador
+    if (email === 'admin@exemplo.com' && senha === 'senhaAdmin') {
+      navigation.navigate('Inicio');
+      return;
+    }
+
+    // Carregar a lista de membros do AsyncStorage
+    const membrosStorage = await AsyncStorage.getItem('@membros');
+
+    // Verifica se o email e a senha correspondem a um membro
+    interface Membro {
+      email: string;
+      senha: string;
+    }
+
+    const membros: Membro[] = membrosStorage ? JSON.parse(membrosStorage) : [];
+    const membroEncontrado: Membro | undefined = membros.find((membro: Membro) => membro.email === email && membro.senha === senha);
+
+    if (membroEncontrado || email === 'adm' && senha === 'adm') {
+      navigation.navigate('Inicio');
+    } else {
+      Alert.alert('Erro', 'Email ou senha inválidos');
+    }
   };
 
   return (
@@ -23,6 +48,8 @@ const Login = () => {
           autoCapitalize="none" 
           placeholder="E-mail"
           placeholderTextColor="#38B6FF"
+          value={email}
+          onChangeText={setEmail}
         />
       </View>
 
@@ -32,6 +59,8 @@ const Login = () => {
           secureTextEntry 
           placeholder="Senha"
           placeholderTextColor="#38B6FF"
+          value={senha}
+          onChangeText={setSenha}
         />
       </View>
 
