@@ -1,28 +1,104 @@
-import React, { useEffect, useState } from 'react';
-import { Text, TouchableOpacity, StyleSheet, Dimensions, View, Image, ScrollView } from 'react-native';
+import React, { useEffect, useState } from 'react'; 
+import { Text, TouchableOpacity, StyleSheet, Dimensions, View, Image, ScrollView, Modal, TextInput, Alert } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import carrosData from '../bancoDados/Dados/Carros.json';
 
 const { width } = Dimensions.get('window');
 
-const CarrosCrud = () => {
-  interface Carro {
-    nome: string;
-    ano: number;
-    preco_por_hora: number;
-    consumo_por_litro: number;
-    placa: string;
-    status: string;
-    foto: string;
-  }
+interface Carro {
+  nome: string;
+  ano: number;
+  preco_por_hora: number;
+  consumo_por_litro: number;
+  placa: string;
+  status: string;
+  foto: string;
+}
 
-  const [carros, setCarros] = useState<Carro[]>([]);
+interface CarrosCrudProps {
+  carros: Carro[];
+  setCarros: React.Dispatch<React.SetStateAction<Carro[]>>;
+}
 
+const CarrosCrud: React.FC<CarrosCrudProps> = ({ carros, setCarros }) => {
+  const [showModal, setShowModal] = useState<boolean>(false);
+  const [showEditModal, setShowEditModal] = useState<boolean>(false);
+  const [selectedCarro, setSelectedCarro] = useState<Carro | null>(null);
+  const [editedNome, setEditedNome] = useState<string>('');
+  const [editedAno, setEditedAno] = useState<number>(new Date().getFullYear());
+  const [editedPreco, setEditedPreco] = useState<number>(0);
+  const [editedConsumo, setEditedConsumo] = useState<number>(0);
+  const [editedPlaca, setEditedPlaca] = useState<string>('');
+  const [editedStatus, setEditedStatus] = useState<string>('disponível');
+
+  // Carregar carros do AsyncStorage ou do JSON inicial
   useEffect(() => {
-    if (carrosData.carros.length > 0) {
-      setCarros(carrosData.carros);
-    }
+    const carregarCarros = async () => {
+      try {
+        const jsonValue = await AsyncStorage.getItem('@carros');
+        if (jsonValue !== null) {
+          setCarros(JSON.parse(jsonValue));
+        } else {
+          setCarros(carrosData.carros);
+          await AsyncStorage.setItem('@carros', JSON.stringify(carrosData.carros));
+        }
+      } catch (error) {
+        console.error('Erro ao carregar carros:', error);
+      }
+    };
+
+    carregarCarros();
   }, []);
+
+  // Salvar carros no AsyncStorage
+  const salvarCarros = async (novosCarros: Carro[]) => {
+    try {
+      await AsyncStorage.setItem('@carros', JSON.stringify(novosCarros));
+      setCarros(novosCarros);
+    } catch (error) {
+      console.error('Erro ao salvar carros:', error);
+    }
+  };
+
+  // Deletar um carro
+  const handleDelete = (placa: string) => {
+    const novosCarros = carros.filter(carro => carro.placa !== placa);
+    salvarCarros(novosCarros);
+    Alert.alert('Carro deletado com sucesso!');
+  };
+
+  // Ver detalhes do carro
+  const handleView = (carro: Carro) => {
+    setSelectedCarro(carro);
+    setShowModal(true);
+  };
+
+  // Editar carro
+  const handleEdit = (carro: Carro) => {
+    setSelectedCarro(carro);
+    setEditedNome(carro.nome);
+    setEditedAno(carro.ano);
+    setEditedPreco(carro.preco_por_hora);
+    setEditedConsumo(carro.consumo_por_litro);
+    setEditedPlaca(carro.placa);
+    setEditedStatus(carro.status);
+    setShowEditModal(true);
+  };
+
+  // Salvar edição
+  const handleSaveEdit = () => {
+    if (selectedCarro) {
+      const novosCarros = carros.map(carro =>
+        carro.placa === selectedCarro.placa
+          ? { ...carro, nome: editedNome, ano: editedAno, preco_por_hora: editedPreco, consumo_por_litro: editedConsumo, placa: editedPlaca, status: editedStatus }
+          : carro
+      );
+      salvarCarros(novosCarros);
+      setShowEditModal(false);
+      Alert.alert('Carro editado com sucesso!');
+    }
+  };
 
   if (carros.length === 0) {
     return <Text style={styles.texto}>Carregando...</Text>;
@@ -32,7 +108,7 @@ const CarrosCrud = () => {
     <ScrollView contentContainerStyle={styles.scrollContainer}>
       {carros.map((carro, index) => (
         <View key={index} style={styles.container}>
-          <Image source={{ uri: `https://images.app.goo.gl/k5x2na3LijBRb6fR9` }} style={styles.carro} />
+          <Image source={{ uri: carro.foto }} style={styles.carro} />
           <View style={styles.info}>
             <Text style={styles.texto}>{carro.nome} - {carro.ano}</Text>
 
@@ -42,25 +118,102 @@ const CarrosCrud = () => {
             </TouchableOpacity>
 
             <View style={styles.botoesContainer}>
-              <TouchableOpacity style={styles.botao}>
+              <TouchableOpacity style={styles.botao} onPress={() => handleView(carro)}>
                 <Icon name="eye" size={width * 0.05} color={"#38B6FF"} />
                 <Text style={styles.textoBtn}>{'Ver'}</Text>
               </TouchableOpacity>
 
-              <TouchableOpacity style={styles.botao}>
+              <TouchableOpacity style={styles.botao} onPress={() => handleEdit(carro)}>
                 <Icon name="pencil" size={width * 0.05} color={"#38B6FF"} />
                 <Text style={styles.textoBtn}>{'Editar'}</Text>
               </TouchableOpacity>
 
-              <TouchableOpacity style={styles.botao}>
+              <TouchableOpacity style={styles.botao} onPress={() => handleDelete(carro.placa)}>
                 <Icon name="trash" size={width * 0.05} color={"#38B6FF"} />
                 <Text style={styles.textoBtn}>{'Deletar'}</Text>
               </TouchableOpacity>
             </View>
-
           </View>
         </View>
       ))}
+
+      {/* Modal para ver detalhes do carro */}
+      {selectedCarro && (
+        <Modal visible={showModal} animationType="slide" transparent={true} onRequestClose={() => setShowModal(false)}>
+          <View style={styles.modalContainer}>
+            <View style={styles.modalContent}>
+              <Text style={styles.modalTitle}>Detalhes do Carro</Text>
+              <Text style={styles.modalText}>Nome: {selectedCarro.nome}</Text>
+              <Text style={styles.modalText}>Ano: {selectedCarro.ano}</Text>
+              <Text style={styles.modalText}>Preço por Hora: R${selectedCarro.preco_por_hora}</Text>
+              <Text style={styles.modalText}>Consumo por Litro: {selectedCarro.consumo_por_litro} km/l</Text>
+              <Text style={styles.modalText}>Placa: {selectedCarro.placa}</Text>
+              <Text style={styles.modalText}>Status: {selectedCarro.status}</Text>
+
+              <TouchableOpacity style={styles.closeBtn} onPress={() => setShowModal(false)}>
+                <Text style={styles.closeText}>Fechar</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </Modal>
+      )}
+
+      {/* Modal para editar carro */}
+      {selectedCarro && (
+        <Modal visible={showEditModal} animationType="slide" transparent={true} onRequestClose={() => setShowEditModal(false)}>
+          <View style={styles.modalContainer}>
+            <View style={styles.modalContent}>
+              <Text style={styles.modalTitle}>Editar Carro</Text>
+              <TextInput
+                style={styles.input}
+                value={editedNome}
+                onChangeText={setEditedNome}
+                placeholder="Nome"
+              />
+              <TextInput
+                style={styles.input}
+                value={editedAno.toString()}
+                onChangeText={text => setEditedAno(Number(text))}
+                placeholder="Ano"
+                keyboardType="numeric"
+              />
+              <TextInput
+                style={styles.input}
+                value={editedPreco.toString()}
+                onChangeText={text => setEditedPreco(Number(text))}
+                placeholder="Preço por Hora"
+                keyboardType="numeric"
+              />
+              <TextInput
+                style={styles.input}
+                value={editedConsumo.toString()}
+                onChangeText={text => setEditedConsumo(Number(text))}
+                placeholder="Consumo por Litro"
+                keyboardType="numeric"
+              />
+              <TextInput
+                style={styles.input}
+                value={editedPlaca}
+                onChangeText={setEditedPlaca}
+                placeholder="Placa"
+              />
+              <TextInput
+                style={styles.input}
+                value={editedStatus}
+                onChangeText={setEditedStatus}
+                placeholder="Status (disponível/indisponível)"
+              />
+
+              <TouchableOpacity style={styles.saveBtn} onPress={handleSaveEdit}>
+                <Text style={styles.closeText}>Salvar</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.closeBtn} onPress={() => setShowEditModal(false)}>
+                <Text style={styles.closeText}>Cancelar</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </Modal>
+      )}
     </ScrollView>
   );
 };
@@ -113,10 +266,58 @@ const styles = StyleSheet.create({
   },
   botoesContainer: {
     flexDirection: 'row',
-    justifyContent: 'space-around',
-    width: '100%',
+    justifyContent: 'center',
     marginTop: 10,
-    marginRight: width * 0.25,
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  modalContent: {
+    backgroundColor: 'white',
+    padding: 20,
+    borderRadius: 10,
+    width: width * 0.8,
+    flexDirection: 'row', // Adicionando essa linha para colocar as views lado a lado
+    justifyContent: 'space-between', // Distribui o espaço entre as views
+    alignItems: 'center', // Alinha as views ao centro verticalmente
+  },
+  modalTitle: {
+    fontSize: width * 0.05,
+    fontWeight: 'bold',
+    marginBottom: 15,
+  },
+  modalText: {
+    fontSize: width * 0.04,
+    marginBottom: 10,
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 5,
+    padding: 10,
+    marginBottom: 20,
+    width: '100%',
+  },
+  closeBtn: {
+    backgroundColor: '#5271FF',
+    padding: 10,
+    alignItems: 'center',
+    borderRadius: 5,
+    marginTop: 10,
+  },
+  saveBtn: {
+    backgroundColor: '#38B6FF',
+    padding: 10,
+    alignItems: 'center',
+    borderRadius: 5,
+    marginTop: 10,
+  },
+  closeText: {
+    color: 'white',
+    fontWeight: 'bold',
   },
 });
 

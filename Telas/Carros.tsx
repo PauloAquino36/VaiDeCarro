@@ -1,49 +1,86 @@
-import React, { useState } from 'react';
-import { View, TextInput, Image, StyleSheet, Dimensions, TouchableOpacity, Text, Modal } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, TextInput, Image, StyleSheet, Dimensions, TouchableOpacity, Text, Modal, Alert } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import Navbar from '../Componentes/NavBar';
-import CarrosCrud from '../Componentes/CarrosCrud';
-import UploadFoto from '../Componentes/UploadFoto'; 
+import CarrosCrud from '../Componentes/CarrosCrud'; // Supondo que você tenha um componente CarrosCrud
 
 const { width } = Dimensions.get('window');
 
-const Carros = () => {
-  const [modalVisible, setModalVisible] = useState(false);
-  const [novoCarro, setNovoCarro] = useState({
-    nome: '',
-    ano: '',
-    preco_por_hora: '',
-    consumo_por_litro: '',
-    placa: '',
-    status: 'disponível',
-    foto: '',
-  });
-
 interface Carro {
-    nome: string;
-    ano: string;
-    preco_por_hora: string;
-    consumo_por_litro: string;
-    placa: string;
-    status: string;
-    foto: string;
+  nome: string;
+  marca: string;
+  ano: string;
+  placa: string;
+  foto?: string;
+  preco_por_hora?: string;
+  consumo_por_litro?: string;
 }
 
-const handleInputChange = (key: keyof Carro, value: string) => {
-    setNovoCarro({ ...novoCarro, [key]: value });
-};
+const Carros = () => {
+  const [modalVisible, setModalVisible] = useState(false);
+  const [carros, setCarros] = useState<Carro[]>([]);
+  const [novoCarro, setNovoCarro] = useState<Carro>({
+    nome: '',
+    marca: '',
+    ano: '',
+    placa: '',
+  });
 
-  const adicionarCarro = () => {
-    console.log('Novo carro adicionado:', novoCarro);
+  const handleInputChange = (key: keyof Carro, value: string) => {
+    setNovoCarro((prevCarro) => ({
+      ...prevCarro,
+      [key]: value,
+    }));
+  };
+
+  const adicionarCarro = async () => {
+    if (!novoCarro.nome || !novoCarro.placa) {
+      Alert.alert('Erro', 'Preencha pelo menos Nome e Placa');
+      return;
+    }
+  
+    const novosCarros = [...carros, novoCarro];
+  
+    // Chame setCarros aqui para atualizar a lista no componente CarrosCrud
+    setCarros(novosCarros);
+  
+    // Salvar carros no AsyncStorage
+    try {
+      await AsyncStorage.setItem('@carros', JSON.stringify(novosCarros));
+    } catch (error) {
+      console.error('Erro ao salvar carros no AsyncStorage:', error);
+    }
+  
+    setNovoCarro({ nome: '', marca: '', ano: '', placa: '' });
     setModalVisible(false);
   };
+  
+  
+  
+
+
+  useEffect(() => {
+    const carregarCarros = async () => {
+      try {
+        const jsonValue = await AsyncStorage.getItem('@carros');
+        if (jsonValue !== null) {
+          setCarros(JSON.parse(jsonValue));
+        }
+      } catch (error) {
+        console.error('Erro ao carregar carros:', error);
+      }
+    };
+
+    carregarCarros();
+  }, []);
 
   return (
     <View style={styles.container}>
       <Image source={require('../assets/Imgs/VaiDeCarro_logo.png')} style={styles.logo} />
 
       <View style={styles.searchContainer}>
-        <Icon name="search" size={width * 0.05} color="#38B6FF" style={styles.icon} />
+        <Icon name="search" size={20} color="#38B6FF" style={styles.icon} />
         <TextInput 
           style={styles.searchBar} 
           placeholder="Pesquisar..." 
@@ -51,15 +88,13 @@ const handleInputChange = (key: keyof Carro, value: string) => {
         />
       </View>
 
-      {/* Botão de adicionar */}
       <TouchableOpacity style={styles.botao} onPress={() => setModalVisible(true)}>
-        <Icon name="plus" size={width * 0.05} color="#38B6FF" style={styles.icon} />
-        <Text style={styles.textoBtn}>Adicionar</Text>
+        <Icon name="plus" size={20} color="#38B6FF" style={styles.icon} />
+        <Text style={styles.textoBtn}>Adicionar Carro</Text>
       </TouchableOpacity>
 
-      <CarrosCrud />
+      <CarrosCrud carros={carros} setCarros={setCarros} />
 
-      {/* Modal de Adicionar Carro */}
       <Modal animationType="slide" transparent={true} visible={modalVisible}>
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
@@ -117,9 +152,7 @@ const handleInputChange = (key: keyof Carro, value: string) => {
         </View>
       </Modal>
 
-
       <Navbar />
-
     </View>
   );
 };
@@ -165,7 +198,6 @@ const styles = StyleSheet.create({
     fontSize: width * 0.03,
     fontWeight: 'bold',
   },
-  /* Estilos do Modal */
   modalContainer: {
     flex: 1,
     justifyContent: 'center',
