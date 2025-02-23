@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, TextInput, Image, StyleSheet, Dimensions, TouchableOpacity, Text, Modal, Alert } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import Navbar from '../Componentes/NavBar';
 import MembrosCrud from '../Componentes/MembrosCrud';
@@ -34,16 +35,26 @@ const Membros = () => {
     }));
   };
 
-  const adicionarMembro = () => {
+  const adicionarMembro = async () => {
     if (!novoMembro.nome || !novoMembro.email) {
       Alert.alert('Erro', 'Preencha pelo menos Nome e Email');
       return;
     }
-
-    setMembros((prevMembros) => [...prevMembros, novoMembro]);
-    
-
-    setNovoMembro({ // Resetando o formulário
+  
+    setMembros((prevMembros) => {
+      const novosMembros = [...prevMembros, novoMembro];
+      console.log('Lista de membros atualizada:', novosMembros);
+      return novosMembros;
+    });
+  
+    // Salvar membros no AsyncStorage
+    try {
+      await AsyncStorage.setItem('@membros', JSON.stringify([...membros, novoMembro]));
+    } catch (error) {
+      console.error('Erro ao salvar membros no AsyncStorage:', error);
+    }
+  
+    setNovoMembro({ // Limpa o formulário
       cargo: '',
       nome: '',
       email: '',
@@ -51,14 +62,27 @@ const Membros = () => {
       numero: '',
       cpf: '',
     });
-
-    setModalVisible(false);
+  
+    setModalVisible(false); // Fecha o modal
   };
+  
 
   // Monitora mudanças no estado `membros`
   useEffect(() => {
-    console.log('Lista de membros atualizada:', membros);
-  }, [membros]);
+    const carregarMembros = async () => {
+      try {
+        const jsonValue = await AsyncStorage.getItem('@membros');
+        if (jsonValue !== null) {
+          setMembros(JSON.parse(jsonValue));
+        }
+      } catch (error) {
+        console.error('Erro ao carregar membros:', error);
+      }
+    };
+  
+    carregarMembros();
+  }, []);
+  
 
   return (
     <View style={styles.container}>
