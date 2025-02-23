@@ -3,6 +3,7 @@ import { Text, TouchableOpacity, StyleSheet, Dimensions, View, Image, ScrollView
 import Icon from 'react-native-vector-icons/FontAwesome';
 import membrosData from '../bancoDados/Dados/Membros.json';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Picker } from '@react-native-picker/picker';
 
 
 interface Membro {
@@ -16,7 +17,7 @@ interface Membro {
   cpf: string;
 }
 
-const { width } = Dimensions.get('window');
+const { width, height } = Dimensions.get('window');
 
 interface MembrosCrudProps {
   membros: Membro[];
@@ -35,23 +36,35 @@ const MembrosCrud: React.FC<MembrosCrudProps> = ({ membros, setMembros }) => {
   const [editedCargo, setEditedCargo] = useState<string>('');
 
   useEffect(() => {
-    const carregarMembros = async () => {
-      try {
-        const jsonValue = await AsyncStorage.getItem('@membros');
-        if (jsonValue !== null) {
-          setMembros(JSON.parse(jsonValue));
-        } else {
-          // Carregar dados iniciais se não houver membros
+  const carregarMembros = async () => {
+    try {
+      const jsonValue = await AsyncStorage.getItem('@membros');
+      if (jsonValue) {
+        try {
+          const parsedMembros = JSON.parse(jsonValue);
+          if (Array.isArray(parsedMembros)) {
+            setMembros(parsedMembros);
+          } else {
+            throw new Error('Dados inválidos no AsyncStorage');
+          }
+        } catch (error) {
+          console.error('Erro ao processar os dados do AsyncStorage:', error);
           setMembros(membrosData.membros);
           await AsyncStorage.setItem('@membros', JSON.stringify(membrosData.membros));
         }
-      } catch (error) {
-        console.error('Erro ao carregar membros:', error);
+      } else {
+        // Se não houver dados, carregar os iniciais
+        setMembros(membrosData.membros);
+        await AsyncStorage.setItem('@membros', JSON.stringify(membrosData.membros));
       }
-    };
+    } catch (error) {
+      console.error('Erro ao carregar membros:', error);
+    }
+  };
 
-    carregarMembros();
-  }, [setMembros]);
+  carregarMembros();
+}, []);
+
 
   const salvarMembros = async (novosMembros: Membro[]) => {
     try {
@@ -160,32 +173,87 @@ const MembrosCrud: React.FC<MembrosCrudProps> = ({ membros, setMembros }) => {
 
       {/* Modal para editar membro */}
       {selectedMembro && (
-        <Modal visible={showEditModal} animationType="slide" transparent={true} onRequestClose={() => setShowEditModal(false)}>
-          <View style={styles.modalContainer}>
-            <View style={styles.modalContentEdit}>
-              <Text style={styles.modalTitle}>Editar Membro</Text>
-              <Text style={styles.modalTextInput}>Nome:</Text>
-              <TextInput style={styles.input} value={editedName} onChangeText={setEditedName} placeholder="Digite o novo nome" />
-              <Text style={styles.modalTextInput}>Email:</Text>
-              <TextInput style={styles.input} value={editedEmail} onChangeText={setEditedEmail} placeholder="Digite o novo email" />
-              <Text style={styles.modalTextInput}>Senha:</Text>
-              <TextInput style={styles.input} value={editedSenha} onChangeText={setEditedSenha} placeholder="Digite a nova senha" />
-              <Text style={styles.modalTextInput}>Telefone:</Text>
-              <TextInput style={styles.input} value={editedTelefone} onChangeText={setEditedTelefone} placeholder="Digite o novo telefone" />
-              <Text style={styles.modalTextInput}>CPF:</Text>
-              <TextInput style={styles.input} value={editedCpf} onChangeText={setEditedCpf} placeholder="Digite o novo CPF" />
-              <Text style={styles.modalTextInput}>Cargo:</Text>
-              <TextInput style={styles.input} value={editedCargo} onChangeText={setEditedCargo} placeholder="Digite o novo cargo" />
-              <TouchableOpacity style={styles.saveBtn} onPress={handleSaveEdit}>
-                <Text style={styles.closeText}>Salvar</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.closeBtn} onPress={() => setShowEditModal(false)}>
-                <Text style={styles.closeText}>Cancelar</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        </Modal>
-      )}
+  <Modal
+    visible={showEditModal}
+    animationType="slide"
+    transparent={true}
+    onRequestClose={() => setShowEditModal(false)}
+  >
+    <View style={styles.modalContainer}>
+      <View style={styles.modalContentEdit}>
+        <Text style={styles.modalTitle}>Editar Membro</Text>
+
+        <Text style={styles.modalTextInput}>Nome:</Text>
+        <TextInput
+          style={styles.input}
+          value={editedName}
+          onChangeText={setEditedName}
+          placeholder="Digite o novo nome"
+        />
+
+        <Text style={styles.modalTextInput}>Email:</Text>
+        <TextInput
+          style={styles.input}
+          value={editedEmail}
+          onChangeText={setEditedEmail}
+          placeholder="Digite o novo email"
+        />
+
+        <Text style={styles.modalTextInput}>Senha:</Text>
+        <TextInput
+          style={styles.input}
+          value={editedSenha}
+          onChangeText={setEditedSenha}
+          placeholder="Digite a nova senha"
+          secureTextEntry
+        />
+
+        <Text style={styles.modalTextInput}>Telefone:</Text>
+        <TextInput
+          style={styles.input}
+          value={editedTelefone}
+          onChangeText={setEditedTelefone}
+          placeholder="Digite o novo telefone"
+        />
+
+        <Text style={styles.modalTextInput}>CPF:</Text>
+        <TextInput
+          style={styles.input}
+          value={editedCpf}
+          onChangeText={setEditedCpf}
+          placeholder="Digite o novo CPF"
+        />
+
+        <Text style={styles.modalTextInput}>Cargo:</Text>
+       
+       
+
+      <Picker
+                    selectedValue={editedCargo}
+                    onValueChange={(itemValue) => {
+                      console.log('Novo cargo selecionado:', itemValue);
+                      setEditedCargo(itemValue);
+                    }}
+                    style={styles.input}
+                  >
+                    <Picker.Item label="Selecione um cargo" value="" />
+                    <Picker.Item label="Administrador" value="Administrador" />
+                    <Picker.Item label="Funcionário" value="Funcionário" />
+                    <Picker.Item label="Desenvolvedor" value="Desenvolvedor" />
+                    <Picker.Item label="Proprietário da Frota" value="Proprietário da Frota" />
+                  </Picker>
+
+        <TouchableOpacity style={styles.saveBtn} onPress={handleSaveEdit}>
+          <Text style={styles.closeText}>Salvar</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.closeBtn} onPress={() => setShowEditModal(false)}>
+          <Text style={styles.closeText}>Cancelar</Text>
+        </TouchableOpacity>
+      </View>
+    </View>
+  </Modal>
+)}
+
 
       {/* Modal de confirmação de exclusão */}
       {selectedMembro && (
@@ -333,6 +401,8 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
   },
+  
+  
 });
 
 export default MembrosCrud;

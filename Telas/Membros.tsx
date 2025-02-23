@@ -4,6 +4,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import Navbar from '../Componentes/NavBar';
 import MembrosCrud from '../Componentes/MembrosCrud';
+import { Picker } from '@react-native-picker/picker';
 
 const { width } = Dimensions.get('window');
 
@@ -40,20 +41,20 @@ const Membros = () => {
       Alert.alert('Erro', 'Preencha pelo menos Nome e Email');
       return;
     }
-  
+
     setMembros((prevMembros) => {
       const novosMembros = [...prevMembros, novoMembro];
       console.log('Lista de membros atualizada:', novosMembros);
       return novosMembros;
     });
-  
+
     // Salvar membros no AsyncStorage
     try {
       await AsyncStorage.setItem('@membros', JSON.stringify([...membros, novoMembro]));
     } catch (error) {
       console.error('Erro ao salvar membros no AsyncStorage:', error);
     }
-  
+
     setNovoMembro({ // Limpa o formulário
       cargo: '',
       nome: '',
@@ -62,10 +63,9 @@ const Membros = () => {
       numero: '',
       cpf: '',
     });
-  
+
     setModalVisible(false); // Fecha o modal
   };
-  
 
   // Monitora mudanças no estado `membros`
   useEffect(() => {
@@ -79,10 +79,9 @@ const Membros = () => {
         console.error('Erro ao carregar membros:', error);
       }
     };
-  
+
     carregarMembros();
   }, []);
-  
 
   return (
     <View style={styles.container}>
@@ -97,8 +96,6 @@ const Membros = () => {
         />
       </View>
 
-      
-
       <TouchableOpacity style={styles.botao} onPress={() => setModalVisible(true)}>
         <Icon name="plus" size={20} color="#38B6FF" style={styles.icon} />
         <Text style={styles.textoBtn}>Adicionar Membro</Text>
@@ -111,12 +108,18 @@ const Membros = () => {
           <View style={styles.modalContent}>
             <Text style={styles.modalTitle}>Adicionar Membro</Text>
 
-            <TextInput 
-              style={styles.input} 
-              placeholder="Cargo" 
-              value={novoMembro.cargo}
-              onChangeText={(value) => handleInputChange('cargo', value)}
-            />
+            <Picker
+              selectedValue={novoMembro.cargo}
+              onValueChange={(value) => handleInputChange('cargo', value)}
+              style={styles.input}
+            >
+              <Picker.Item label="Selecione um cargo" value="" />
+              <Picker.Item label="Administrador" value="Administrador" />
+              <Picker.Item label="Funcionário" value="Funcionário" />
+              <Picker.Item label="Desenvolvedor" value="Desenvolvedor" />
+              <Picker.Item label="Proprietário da Frota" value="Proprietário da Frota" />
+            </Picker>
+
             <TextInput 
               style={styles.input} 
               placeholder="Nome" 
@@ -168,7 +171,6 @@ const Membros = () => {
     </View>
   );
 };
-
 
 const styles = StyleSheet.create({
   container: {
