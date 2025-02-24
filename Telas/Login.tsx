@@ -3,34 +3,47 @@ import { View, TextInput, Image, StyleSheet, Dimensions, Alert } from 'react-nat
 import { NavigationProp, useNavigation } from '@react-navigation/native';
 import BotaoContornado from '../Componentes/BotaoContornado';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useAuth } from '../AuthContext';
 
 const { width } = Dimensions.get('window');
 
+type RootStackParamList = {
+  Inicio: undefined;
+  // Add other routes here if needed
+};
+
 const Login = () => {
-  const navigation = useNavigation<NavigationProp<any>>();
+  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
+  const { login } = useAuth(); // Use o contexto de autenticação
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
 
   const handleLogin = async () => {
     // Verifica se o usuário é o administrador
     if (email === 'admin@exemplo.com' && senha === 'senhaAdmin') {
+      const user = { email, cargo: 'Administrador' }; // Define o usuário como administrador
+      login(user); // Atualiza o estado de autenticação com o usuário
       navigation.navigate('Inicio');
       return;
     }
 
     // Carregar a lista de membros do AsyncStorage
     const membrosStorage = await AsyncStorage.getItem('@membros');
+    const membros: Membro[] = membrosStorage ? JSON.parse(membrosStorage) : [];
 
     // Verifica se o email e a senha correspondem a um membro
     interface Membro {
       email: string;
       senha: string;
+      cargo: string;
     }
 
-    const membros: Membro[] = membrosStorage ? JSON.parse(membrosStorage) : [];
     const membroEncontrado: Membro | undefined = membros.find((membro: Membro) => membro.email === email && membro.senha === senha);
 
-    if (membroEncontrado || email === 'adm' && senha === 'adm') {
+    if (membroEncontrado) {
+      const user = { email: membroEncontrado.email, cargo: membroEncontrado.cargo }; // Define o usuário encontrado
+      login(user); // Atualiza o estado de autenticação com o usuário encontrado
+      console.log('cargo', user.cargo)
       navigation.navigate('Inicio');
     } else {
       Alert.alert('Erro', 'Email ou senha inválidos');
@@ -42,10 +55,10 @@ const Login = () => {
       <Image source={require('../assets/Imgs/VaiDeCarro_logo.png')} style={styles.logo} />
 
       <View style={styles.inputContainer}>
-        <TextInput 
-          style={styles.input} 
-          keyboardType="email-address" 
-          autoCapitalize="none" 
+        <TextInput
+          style={styles.input}
+          keyboardType="email-address"
+          autoCapitalize="none"
           placeholder="E-mail"
           placeholderTextColor="#38B6FF"
           value={email}
@@ -54,9 +67,9 @@ const Login = () => {
       </View>
 
       <View style={styles.inputContainer}>
-        <TextInput 
-          style={styles.input}  
-          secureTextEntry 
+        <TextInput
+          style={styles.input}
+          secureTextEntry
           placeholder="Senha"
           placeholderTextColor="#38B6FF"
           value={senha}

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Text, TouchableOpacity, StyleSheet, Dimensions, View, Image, ScrollView, Modal } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import { useAuth } from '../AuthContext';
 
 const { width } = Dimensions.get('window');
 
@@ -27,6 +28,7 @@ const Alugado = () => {
   const [valorSemAtraso, setValorSemAtraso] = useState(0);
   const [valorAtraso, setValorAtraso] = useState(0);
   const [multa, setMulta] = useState(0);
+  const { getCargo } = useAuth();
 
   useEffect(() => {
     const carregarAlugueis = async () => {
@@ -118,6 +120,8 @@ const Alugado = () => {
     }
   };
 
+  const cargoUsuario = getCargo();
+
   return (
     <ScrollView contentContainerStyle={styles.scrollContainer}>
       {alugueis.length === 0 ? (
@@ -136,10 +140,14 @@ const Alugado = () => {
                 {`${new Date(aluguel.horaInicio).toLocaleDateString()} - ${new Date(aluguel.horaTermino).toLocaleDateString()}`}
               </Text>
 
-              <TouchableOpacity style={styles.botao} onPress={() => abrirModal(aluguel)}>
-                <Icon name="check-square-o" size={width * 0.05} color="#38B6FF" />
-                <Text style={styles.textoBtn}>Confirmar devolução</Text>
-              </TouchableOpacity>
+              {(cargoUsuario === 'Desenvolvedor' || cargoUsuario === 'Administrador'  || cargoUsuario === 'Funcionário') && (
+                  <>
+                    <TouchableOpacity style={styles.botao} onPress={() => abrirModal(aluguel)}>
+                    <Icon name="check-square-o" size={width * 0.05} color="#38B6FF" />
+                    <Text style={styles.textoBtn}>Confirmar devolução</Text>
+                    </TouchableOpacity>
+                  </>
+                )}
             </View>
           </View>
         ))

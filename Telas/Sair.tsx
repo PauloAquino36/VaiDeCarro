@@ -1,36 +1,33 @@
-import React from 'react';
 import { View, Image, StyleSheet, Dimensions, Text } from 'react-native';
-import Navbar from '../Componentes/NavBar';
 import { useNavigation } from '@react-navigation/native';
 import BotaoContornado from '../Componentes/BotaoContornado';
+import { useAuth } from '../AuthContext'; // Importe o AuthContext
 
 const { width } = Dimensions.get('window');
 
 const Sair = () => {
-  const navigation = useNavigation();
+  const navigation = useNavigation<any>();
+  const { logout } = useAuth(); // Desestruture a função de logout do contexto
 
   const sair = () => {
+    logout(); // Atualiza o estado de autenticação
     console.log('Saindo...');
-    navigation.navigate('Login');
+    navigation.navigate('Login'); // Navega para a tela de login
   };
-
+  
   const Nsair = () => {
     console.log('Não saiu...');
-    navigation.goBack();
+    navigation.goBack(); // Volta para a tela anterior
   };
 
   return (
     <View style={styles.container}>      
-    
-            <Image source={require('../assets/Imgs/VaiDeCarro_logo.png')} style={styles.logo} /> 
-            
-            <View style={styles.container2}>
-                <Text style={styles.texto}>Deseja realmente sair?</Text>
-                <BotaoContornado title="Sim" onPress={sair} />
-                <BotaoContornado title="Não" onPress={Nsair} />
-            </View>
-
-      <Navbar /> 
+      <Image source={require('../assets/Imgs/VaiDeCarro_logo.png')} style={styles.logo} /> 
+      <View style={styles.container2}>
+        <Text style={styles.texto}>Deseja realmente sair?</Text>
+        <BotaoContornado title="Sim" onPress={sair} />
+        <BotaoContornado title="Não" onPress={Nsair} />
+      </View>
     </View>
   );
 };
@@ -58,37 +55,9 @@ const styles = StyleSheet.create({
     marginBottom: width * 0.0,
     resizeMode: 'contain',
   },
-  searchContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    width: width * 0.8,
-    backgroundColor: '#FEFFF5',
-    borderRadius: 27,
-    paddingHorizontal: 15,
-  },
-  icon: {
-    marginRight: 10,
-  },
-  searchBar: {
-    flex: 1,
-    paddingVertical: width * 0.02,
-    fontSize: width * 0.04,
-    color: '#000',
-  },
-  botao: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginLeft: width * 0.65,
-    marginTop: width * 0.025,
-  },
   texto: {
     color: 'white',
     fontSize: width * 0.05,
-    fontWeight: 'bold',
-  },
-  textoBtn: {
-    color: 'white',
-    fontSize: width * 0.03,
     fontWeight: 'bold',
   },
 });

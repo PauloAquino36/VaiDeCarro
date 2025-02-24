@@ -4,7 +4,7 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import membrosData from '../bancoDados/Dados/Membros.json';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Picker } from '@react-native-picker/picker';
-
+import { useAuth } from '../AuthContext';
 
 interface Membro {
   id: number;
@@ -21,9 +21,10 @@ const { width, height } = Dimensions.get('window');
 
 interface MembrosCrudProps {
   membros: Membro[];
+  setMembros: (membros: Membro[]) => void;
 }
 
-const MembrosCrud: React.FC<MembrosCrudProps> = ({ membros, setMembros }) => {
+const MembrosCrud: React.FC<MembrosCrudProps> = ({ membros, setMembros}) => {
   const [showModal, setShowModal] = useState<boolean>(false);
   const [showEditModal, setShowEditModal] = useState<boolean>(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState<boolean>(false);
@@ -34,6 +35,8 @@ const MembrosCrud: React.FC<MembrosCrudProps> = ({ membros, setMembros }) => {
   const [editedTelefone, setEditedTelefone] = useState<string>('');
   const [editedCpf, setEditedCpf] = useState<string>('');
   const [editedCargo, setEditedCargo] = useState<string>('');
+  const { getCargo } = useAuth();
+
 
   useEffect(() => {
   const carregarMembros = async () => {
@@ -118,10 +121,13 @@ const MembrosCrud: React.FC<MembrosCrudProps> = ({ membros, setMembros }) => {
       Alert.alert('Membro editado com sucesso!');
     }
   };
+  
 
   if (membros.length === 0) {
     return <Text style={styles.texto}>Carregando...</Text>;
   }
+
+  const cargoUsuario = getCargo();
 
   return (
     <ScrollView contentContainerStyle={styles.scrollContainer}>
@@ -135,14 +141,18 @@ const MembrosCrud: React.FC<MembrosCrudProps> = ({ membros, setMembros }) => {
                 <Icon name="eye" size={width * 0.05} color={"#38B6FF"} />
                 <Text style={styles.textoBtn}>Ver</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={styles.botao} onPress={() => handleEdit(membro)}>
-                <Icon name="pencil" size={width * 0.05} color={"#38B6FF"} />
-                <Text style={styles.textoBtn}>Editar</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.botao} onPress={() => handleDelete(membro)}>
-                <Icon name="trash" size={width * 0.05} color={"#38B6FF"} />
-                <Text style={styles.textoBtn}>Deletar</Text>
-              </TouchableOpacity>
+              {(cargoUsuario === 'Desenvolvedor' || cargoUsuario === 'Administrador') && (
+                <>
+                  <TouchableOpacity style={styles.botao} onPress={() => handleEdit(membro)}>
+                    <Icon name="pencil" size={width * 0.05} color={"#38B6FF"} />
+                    <Text style={styles.textoBtn}>Editar</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity style={styles.botao} onPress={() => handleDelete(membro)}>
+                    <Icon name="trash" size={width * 0.05} color={"#38B6FF"} />
+                    <Text style={styles.textoBtn}>Deletar</Text>
+                  </TouchableOpacity>
+                </>
+              )}
             </View>
           </View>
         </View>
@@ -158,7 +168,6 @@ const MembrosCrud: React.FC<MembrosCrudProps> = ({ membros, setMembros }) => {
                 <Text style={styles.modalText}>Cargo: {selectedMembro.cargo}</Text>
                 <Text style={styles.modalText}>Email: {selectedMembro.email}</Text>
                 <Text style={styles.modalText}>Número: {selectedMembro.telefone}</Text>
-                <Text style={styles.modalText}>CPF: {selectedMembro.cpf}</Text>
                 <TouchableOpacity style={styles.closeBtn} onPress={() => setShowModal(false)}>
                   <Text style={styles.closeText}>Fechar</Text>
                 </TouchableOpacity>

@@ -17,6 +17,8 @@ interface Membro {
   cpf: string;
 }
 
+
+
 const Membros = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const [membros, setMembros] = useState<Membro[]>([]);
@@ -28,6 +30,7 @@ const Membros = () => {
     numero: '',
     cpf: '',
   });
+  
 
   const handleInputChange = (key: keyof Membro, value: string) => {
     setNovoMembro((prevMembro) => ({

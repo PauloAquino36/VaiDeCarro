@@ -1,8 +1,8 @@
+import React from 'react';
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, View } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
-import NavBar from './Componentes/NavBar';
+import { AuthProvider, useAuth } from './AuthContext';
 import Login from './Telas/Login';
 import Inicio from './Telas/Inicio';
 import Carros from './Telas/Carros';
@@ -11,16 +11,32 @@ import Membros from './Telas/Membros';
 
 const Stack = createStackNavigator();
 
-export default function App() {
+const AppNavigator = () => {
+  const { isAuthenticated } = useAuth();
+
   return (
-    <NavigationContainer>
-        <Stack.Navigator screenOptions={{ headerShown: false }}>
+    <Stack.Navigator screenOptions={{ headerShown: false }}>
+      {isAuthenticated ? (
+        <>
           <Stack.Screen name="Inicio" component={Inicio} />
-          <Stack.Screen name="Login" component={Login} />
           <Stack.Screen name="Carros" component={Carros} />
           <Stack.Screen name="Sair" component={Sair} />
           <Stack.Screen name="Membros" component={Membros} />
-        </Stack.Navigator>
-    </NavigationContainer>
+        </>
+      ) : (
+        <Stack.Screen name="Login" component={Login} />
+      )}
+    </Stack.Navigator>
+  );
+};
+
+export default function App() {
+  return (
+    <AuthProvider>
+      <NavigationContainer>
+        <AppNavigator />
+        <StatusBar style="auto" />
+      </NavigationContainer>
+    </AuthProvider>
   );
 }

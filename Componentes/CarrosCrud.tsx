@@ -4,6 +4,7 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import carrosData from '../bancoDados/Dados/Carros.json';
 import DateTimePickerModal from "react-native-modal-datetime-picker";
+import { useAuth } from '../AuthContext';
 
 
 const { width } = Dimensions.get('window');
@@ -58,6 +59,7 @@ const [dataNascimentoCliente, setDataNascimentoCliente] = useState('');
   const [horaTerminoAluguel, setHoraTerminoAluguel] = useState(new Date());
   const [horaInicioAluguel, setHoraInicioAluguel] = useState(new Date().toISOString());
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
+  const { getCargo } = useAuth();
 
 const [aluguéis, setAlugueis] = useState<Aluguel[]>([]);
 
@@ -201,7 +203,7 @@ const handleSaveEdit = () => {
     hideDatePicker();
   };
   
-  
+  const cargoUsuario = getCargo();
 
   if (carros.length === 0) {
     return <Text style={styles.texto}>Carregando...</Text>;
@@ -215,27 +217,37 @@ const handleSaveEdit = () => {
           <View style={styles.info}>
             <Text style={styles.texto}>{carro.nome} - {carro.ano}</Text>
 
-            <TouchableOpacity style={styles.botao} disabled={carro.status === 'indisponível'} onPress={() => handleRent(carro)}>
+            {(cargoUsuario === 'Desenvolvedor' || cargoUsuario === 'Administrador'  || cargoUsuario === 'Funcionário') && (
+    <>
+      <TouchableOpacity style={styles.botao} disabled={carro.status === 'indisponível'} onPress={() => handleRent(carro)}>
               <Icon name="user-plus" size={width * 0.05} color={carro.status === 'disponível' ? "#38B6FF" : "gray"} />
               <Text style={styles.textoBtn}>{carro.status === 'disponível' ? 'Alugar' : 'Indisponível'}</Text>
             </TouchableOpacity>
+    </>
+  )}
+            
 
             <View style={styles.botoesContainer}>
-              <TouchableOpacity style={styles.botao} onPress={() => handleView(carro)}>
-                <Icon name="eye" size={width * 0.05} color={"#38B6FF"} />
-                <Text style={styles.textoBtn}>{'Ver'}</Text>
-              </TouchableOpacity>
+  <TouchableOpacity style={styles.botao} onPress={() => handleView(carro)}>
+    <Icon name="eye" size={width * 0.05} color={"#38B6FF"} />
+    <Text style={styles.textoBtn}>{'Ver'}</Text>
+  </TouchableOpacity>
 
-              <TouchableOpacity style={styles.botao} onPress={() => handleEdit(carro)}>
-                <Icon name="pencil" size={width * 0.05} color={"#38B6FF"} />
-                <Text style={styles.textoBtn}>{'Editar'}</Text>
-              </TouchableOpacity>
+  {(cargoUsuario === 'Desenvolvedor' || cargoUsuario === 'Administrador') && (
+    <>
+      <TouchableOpacity style={styles.botao} onPress={() => handleEdit(carro)}>
+        <Icon name="pencil" size={width * 0.05} color={"#38B6FF"} />
+        <Text style={styles.textoBtn}>{'Editar'}</Text>
+      </TouchableOpacity>
 
-              <TouchableOpacity style={styles.botao} onPress={() => handleDelete(carro.placa)}>
-                <Icon name="trash" size={width * 0.05} color={"#38B6FF"} />
-                <Text style={styles.textoBtn}>{'Deletar'}</Text>
-              </TouchableOpacity>
-            </View>
+      <TouchableOpacity style={styles.botao} onPress={() => handleDelete(carro.placa)}>
+        <Icon name="trash" size={width * 0.05} color={"#38B6FF"} />
+        <Text style={styles.textoBtn}>{'Deletar'}</Text>
+      </TouchableOpacity>
+    </>
+  )}
+</View>
+
           </View>
         </View>
       ))}
