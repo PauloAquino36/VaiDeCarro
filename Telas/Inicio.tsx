@@ -16,14 +16,7 @@ const Inicio = () => {
     <View style={styles.container}>
       <Image source={require('../assets/Imgs/VaiDeCarro_logo.png')} style={styles.logo} />
 
-      <View style={styles.searchContainer}>
-        <Icon name="search" size={width * 0.05} color="#38B6FF" style={styles.icon} />
-        <TextInput
-          style={styles.searchBar}
-          placeholder="Pesquisar..."
-          placeholderTextColor="#888"
-        />
-      </View>
+      
 
       {(cargoUsuario === 'Desenvolvedor' || cargoUsuario === 'Administrador' || cargoUsuario === 'Proprietário da Frota') && (
         <>
@@ -57,28 +50,14 @@ const styles = StyleSheet.create({
     marginBottom: width * 0.0,
     resizeMode: 'contain',
   },
-  searchContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    width: width * 0.8,
-    backgroundColor: '#FEFFF5',
-    borderRadius: 27,
-    paddingHorizontal: 15,
-  },
   icon: {
     marginRight: 10,
-  },
-  searchBar: {
-    flex: 1,
-    paddingVertical: width * 0.02,
-    fontSize: width * 0.04,
-    color: '#000',
   },
   botao: {
     flexDirection: 'row',
     alignItems: 'center',
     marginLeft: width * 0.65,
-    marginTop: width * 0.025,
+    marginBottom: width * 0.025,
   },
   textoBtn: {
     color: 'white',

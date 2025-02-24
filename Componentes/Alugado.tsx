@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import {Text,TouchableOpacity,StyleSheet,Dimensions,View,Image,ScrollView,Modal,} from "react-native";
+import { Text, TouchableOpacity, StyleSheet, Dimensions, View, Image, ScrollView, Modal, TextInput } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Icon from "react-native-vector-icons/FontAwesome";
 import { useAuth } from "../AuthContext";
@@ -31,6 +31,8 @@ const Alugado = () => {
   const [valorAtraso, setValorAtraso] = useState(0);
   const [multa, setMulta] = useState(0);
   const { getCargo } = useAuth();
+  const [filteredAlugueis, setFilteredAlugueis] = useState<Aluguel[]>([]);
+  const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
     const carregarAlugueis = async () => {
@@ -46,6 +48,21 @@ const Alugado = () => {
 
     carregarAlugueis();
   }, []);
+
+  // Filtragem dos aluguéis quando searchQuery muda
+  useEffect(() => {
+    if (!searchQuery.trim()) {
+      setFilteredAlugueis(alugueis);
+    } else {
+      const lowerQuery = searchQuery.toLowerCase();
+      const filtered = alugueis.filter(
+        (aluguel) =>
+          aluguel.carro.nome.toLowerCase().includes(lowerQuery) ||
+          aluguel.cliente.nome.toLowerCase().includes(lowerQuery)
+      );
+      setFilteredAlugueis(filtered);
+    }
+  }, [searchQuery, alugueis]);
 
   interface CalcularPrecoProps {
     carro: {
@@ -139,11 +156,22 @@ const Alugado = () => {
   const cargoUsuario = getCargo();
 
   return (
+    <View>
+        <View style={styles.searchContainer}>
+        <Icon name="search" size={width * 0.05} color="#38B6FF" style={styles.icon} />
+        <TextInput
+          style={styles.searchBar}
+          placeholder="Pesquisar por carro ou cliente..."
+          placeholderTextColor="#888"
+          value={searchQuery}
+          onChangeText={setSearchQuery}
+        />
+      </View>
     <ScrollView contentContainerStyle={styles.scrollContainer}>
-      {alugueis.length === 0 ? (
+    {filteredAlugueis.length === 0 ? (
         <Text style={styles.texto}>Nenhum carro alugado.</Text>
       ) : (
-        alugueis.map((aluguel, index) => (
+        filteredAlugueis.map((aluguel, index) => (
           <View key={index} style={styles.container}>
             <Image
               source={{ uri: `../bancoDados/Carros/${aluguel.carro.foto}` }}
@@ -163,20 +191,20 @@ const Alugado = () => {
               {(cargoUsuario === "Desenvolvedor" ||
                 cargoUsuario === "Administrador" ||
                 cargoUsuario === "Funcionário") && (
-                <>
-                  <TouchableOpacity
-                    style={styles.botao}
-                    onPress={() => abrirModal(aluguel)}
-                  >
-                    <Icon
-                      name="check-square-o"
-                      size={width * 0.05}
-                      color="#38B6FF"
-                    />
-                    <Text style={styles.textoBtn}>Confirmar devolução</Text>
-                  </TouchableOpacity>
-                </>
-              )}
+                  <>
+                    <TouchableOpacity
+                      style={styles.botao}
+                      onPress={() => abrirModal(aluguel)}
+                    >
+                      <Icon
+                        name="check-square-o"
+                        size={width * 0.05}
+                        color="#38B6FF"
+                      />
+                      <Text style={styles.textoBtn}>Confirmar devolução</Text>
+                    </TouchableOpacity>
+                  </>
+                )}
             </View>
           </View>
         ))
@@ -186,7 +214,7 @@ const Alugado = () => {
       <Modal visible={modalVisible} transparent animationType="slide">
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
-            
+
             <Text style={styles.modalTitulo}>Resumo do Aluguel</Text>
             {aluguelSelecionado && (
               <>
@@ -240,6 +268,7 @@ const Alugado = () => {
         </View>
       </Modal>
     </ScrollView>
+    </View>
   );
 };
 
@@ -258,6 +287,23 @@ const styles = StyleSheet.create({
     borderColor: "#5271FF",
     borderRadius: 30,
     marginBottom: 15,
+  },
+  searchContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    width: width * 0.8,
+    backgroundColor: '#FEFFF5',
+    borderRadius: 27,
+    paddingHorizontal: 15,
+  },
+  icon: {
+    marginRight: 10,
+  },
+  searchBar: {
+    flex: 1,
+    paddingVertical: width * 0.02,
+    fontSize: width * 0.04,
+    color: '#000',
   },
   info: {
     justifyContent: "center",
