@@ -18,27 +18,27 @@ const Inicio = () => {
 
       <View style={styles.searchContainer}>
         <Icon name="search" size={width * 0.05} color="#38B6FF" style={styles.icon} />
-        <TextInput 
-          style={styles.searchBar} 
-          placeholder="Pesquisar..." 
+        <TextInput
+          style={styles.searchBar}
+          placeholder="Pesquisar..."
           placeholderTextColor="#888"
         />
       </View>
 
-      {(cargoUsuario === 'Desenvolvedor' || cargoUsuario === 'Administrador'  || cargoUsuario === 'Proprietário da Frota') && (
-    <>
-      <TouchableOpacity style={styles.botao}>
-          <Icon name="print" size={width * 0.05} color="#38B6FF" style={styles.icon} />
-          <Text style={styles.textoBtn}>Relatorio</Text>
-        </TouchableOpacity>  
-    </>
-  )}
+      {(cargoUsuario === 'Desenvolvedor' || cargoUsuario === 'Administrador' || cargoUsuario === 'Proprietário da Frota') && (
+        <>
+          <TouchableOpacity style={styles.botao}>
+            <Icon name="print" size={width * 0.05} color="#38B6FF" style={styles.icon} />
+            <Text style={styles.textoBtn}>Relatorio</Text>
+          </TouchableOpacity>
+        </>
+      )}
 
-              
 
-        <Alugado />
 
-      <Navbar /> 
+      <Alugado />
+
+      <Navbar />
     </View>
   );
 };

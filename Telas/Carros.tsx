@@ -42,25 +42,25 @@ const Carros = () => {
     }
 
     novoCarro.status = 'disponível';
-  
+
     const novosCarros = [...carros, novoCarro];
-  
+
     // Chame setCarros aqui para atualizar a lista no componente CarrosCrud
     setCarros(novosCarros);
-  
+
     // Salvar carros no AsyncStorage
     try {
       await AsyncStorage.setItem('@carros', JSON.stringify(novosCarros));
     } catch (error) {
       console.error('Erro ao salvar carros no AsyncStorage:', error);
     }
-  
+
     setNovoCarro({ nome: '', marca: '', ano: '', placa: '' });
     setModalVisible(false);
   };
-  
-  
-  
+
+
+
 
 
   useEffect(() => {
@@ -84,9 +84,9 @@ const Carros = () => {
 
       <View style={styles.searchContainer}>
         <Icon name="search" size={20} color="#38B6FF" style={styles.icon} />
-        <TextInput 
-          style={styles.searchBar} 
-          placeholder="Pesquisar..." 
+        <TextInput
+          style={styles.searchBar}
+          placeholder="Pesquisar..."
           placeholderTextColor="#888"
         />
       </View>

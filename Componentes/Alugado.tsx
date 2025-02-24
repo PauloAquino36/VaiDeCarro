@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from 'react';
-import { Text, TouchableOpacity, StyleSheet, Dimensions, View, Image, ScrollView, Modal } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import Icon from 'react-native-vector-icons/FontAwesome';
-import { useAuth } from '../AuthContext';
+import React, { useEffect, useState } from "react";
+import {Text,TouchableOpacity,StyleSheet,Dimensions,View,Image,ScrollView,Modal,} from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import Icon from "react-native-vector-icons/FontAwesome";
+import { useAuth } from "../AuthContext";
 
-const { width } = Dimensions.get('window');
+const { width } = Dimensions.get("window");
 
 interface Aluguel {
   carro: {
@@ -23,7 +23,9 @@ interface Aluguel {
 const Alugado = () => {
   const [alugueis, setAlugueis] = useState<Aluguel[]>([]);
   const [modalVisible, setModalVisible] = useState(false);
-  const [aluguelSelecionado, setAluguelSelecionado] = useState<Aluguel | null>(null);
+  const [aluguelSelecionado, setAluguelSelecionado] = useState<Aluguel | null>(
+    null
+  );
   const [precoFinal, setPrecoFinal] = useState(0);
   const [valorSemAtraso, setValorSemAtraso] = useState(0);
   const [valorAtraso, setValorAtraso] = useState(0);
@@ -33,12 +35,12 @@ const Alugado = () => {
   useEffect(() => {
     const carregarAlugueis = async () => {
       try {
-        const jsonValue = await AsyncStorage.getItem('@aluguéis');
+        const jsonValue = await AsyncStorage.getItem("@aluguéis");
         if (jsonValue !== null) {
           setAlugueis(JSON.parse(jsonValue));
         }
       } catch (error) {
-        console.error('Erro ao carregar aluguéis:', error);
+        console.error("Erro ao carregar aluguéis:", error);
       }
     };
 
@@ -59,22 +61,26 @@ const Alugado = () => {
     const termino = new Date(aluguel.horaTermino);
     const agora = new Date();
 
-    let horasTotais = Math.ceil((termino.getTime() - inicio.getTime()) / (1000 * 60 * 60));
-    console.log('Horas totais sem atraso:', horasTotais);
+    let horasTotais = Math.ceil(
+      (termino.getTime() - inicio.getTime()) / (1000 * 60 * 60)
+    );
+    console.log("Horas totais sem atraso:", horasTotais);
     let preco = horasTotais * precoPorHora;
-    console.log('valor sem atraso:', preco);
+    console.log("valor sem atraso:", preco);
 
     // Valores de atraso
     let atrasoValor = 0;
     let multaValor = 0;
 
     if (agora > termino) {
-      const horasAtraso = Math.ceil((agora.getTime() - termino.getTime()) / (1000 * 60 * 60));
-      console.log('Horas totais cm atraso:', horasAtraso);
+      const horasAtraso = Math.ceil(
+        (agora.getTime() - termino.getTime()) / (1000 * 60 * 60)
+      );
+      console.log("Horas totais cm atraso:", horasAtraso);
       atrasoValor = horasAtraso * precoPorHora; // Preço do atraso
-      console.log('valor do atraso:', atrasoValor);
-      multaValor = atrasoValor * 0.20;
-      console.log('multa:', multaValor);
+      console.log("valor do atraso:", atrasoValor);
+      multaValor = atrasoValor * 0.2;
+      console.log("multa:", multaValor);
       preco += multaValor; // Adiciona a multa ao preço final
     }
 
@@ -93,22 +99,32 @@ const Alugado = () => {
   const confirmarDevolucao = async () => {
     if (aluguelSelecionado) {
       try {
-        const carrosStorage = await AsyncStorage.getItem('@carros');
+        const carrosStorage = await AsyncStorage.getItem("@carros");
         let carrosDisponiveis = carrosStorage ? JSON.parse(carrosStorage) : [];
 
-        const carroAtualizado = { ...aluguelSelecionado.carro, status: "disponível" };
+        const carroAtualizado = {
+          ...aluguelSelecionado.carro,
+          status: "disponível",
+        };
 
-        const carroExistenteIndex: number = carrosDisponiveis.findIndex((carro: { id: number }) => carro.id === carroAtualizado.id);
+        const carroExistenteIndex: number = carrosDisponiveis.findIndex(
+          (carro: { id: number }) => carro.id === carroAtualizado.id
+        );
         if (carroExistenteIndex > -1) {
           carrosDisponiveis[carroExistenteIndex] = carroAtualizado;
         } else {
           carrosDisponiveis.push(carroAtualizado);
         }
 
-        await AsyncStorage.setItem('@carros', JSON.stringify(carrosDisponiveis));
+        await AsyncStorage.setItem(
+          "@carros",
+          JSON.stringify(carrosDisponiveis)
+        );
 
-        const novosAlugueis = alugueis.filter((item) => item.carro.id !== aluguelSelecionado.carro.id);
-        await AsyncStorage.setItem('@aluguéis', JSON.stringify(novosAlugueis));
+        const novosAlugueis = alugueis.filter(
+          (item) => item.carro.id !== aluguelSelecionado.carro.id
+        );
+        await AsyncStorage.setItem("@aluguéis", JSON.stringify(novosAlugueis));
 
         setAlugueis(novosAlugueis);
         setModalVisible(false);
@@ -137,17 +153,30 @@ const Alugado = () => {
               <Text style={styles.texto}>{`${aluguel.carro.nome}`}</Text>
               <Text style={styles.texto}>{`${aluguel.cliente.nome}`}</Text>
               <Text style={styles.textoData}>
-                {`${new Date(aluguel.horaInicio).toLocaleDateString()} - ${new Date(aluguel.horaTermino).toLocaleDateString()}`}
+                {`${new Date(
+                  aluguel.horaInicio
+                ).toLocaleDateString()} - ${new Date(
+                  aluguel.horaTermino
+                ).toLocaleDateString()}`}
               </Text>
 
-              {(cargoUsuario === 'Desenvolvedor' || cargoUsuario === 'Administrador'  || cargoUsuario === 'Funcionário') && (
-                  <>
-                    <TouchableOpacity style={styles.botao} onPress={() => abrirModal(aluguel)}>
-                    <Icon name="check-square-o" size={width * 0.05} color="#38B6FF" />
+              {(cargoUsuario === "Desenvolvedor" ||
+                cargoUsuario === "Administrador" ||
+                cargoUsuario === "Funcionário") && (
+                <>
+                  <TouchableOpacity
+                    style={styles.botao}
+                    onPress={() => abrirModal(aluguel)}
+                  >
+                    <Icon
+                      name="check-square-o"
+                      size={width * 0.05}
+                      color="#38B6FF"
+                    />
                     <Text style={styles.textoBtn}>Confirmar devolução</Text>
-                    </TouchableOpacity>
-                  </>
-                )}
+                  </TouchableOpacity>
+                </>
+              )}
             </View>
           </View>
         ))
@@ -160,21 +189,48 @@ const Alugado = () => {
             <Text style={styles.modalTitulo}>Resumo do Aluguel</Text>
             {aluguelSelecionado && (
               <>
-                <Text style={styles.modalTexto}>Carro: {aluguelSelecionado.carro.nome}</Text>
-                <Text style={styles.modalTexto}>Cliente: {aluguelSelecionado.cliente.nome}</Text>
-                <Text style={styles.modalTexto}>Início: {new Date(aluguelSelecionado.horaInicio).toLocaleString()}</Text>
-                <Text style={styles.modalTexto}>Término: {new Date(aluguelSelecionado.horaTermino).toLocaleString()}</Text>
-                <Text style={styles.modalTexto}>Preço por hora: R$ {aluguelSelecionado.carro.preco_por_hora.toFixed(2)}</Text>
-                <Text style={styles.modalTexto}>Valor sem atraso: R$ {valorSemAtraso.toFixed(2)}</Text>
-                <Text style={styles.modalTexto}>Valor do atraso: R$ {valorAtraso.toFixed(2)}</Text>
-                <Text style={styles.modalTexto}>Multa (20% das horas de atraso): R$ {multa.toFixed(2)}</Text>
-                <Text style={styles.modalTexto}>Preço final: R$ {precoFinal.toFixed(2)}</Text>
+                <Text style={styles.modalTexto}>
+                  Carro: {aluguelSelecionado.carro.nome}
+                </Text>
+                <Text style={styles.modalTexto}>
+                  Cliente: {aluguelSelecionado.cliente.nome}
+                </Text>
+                <Text style={styles.modalTexto}>
+                  Início:{" "}
+                  {new Date(aluguelSelecionado.horaInicio).toLocaleString()}
+                </Text>
+                <Text style={styles.modalTexto}>
+                  Término:{" "}
+                  {new Date(aluguelSelecionado.horaTermino).toLocaleString()}
+                </Text>
+                <Text style={styles.modalTexto}>
+                  Preço por hora: R${" "}
+                  {aluguelSelecionado.carro.preco_por_hora.toFixed(2)}
+                </Text>
+                <Text style={styles.modalTexto}>
+                  Valor sem atraso: R$ {valorSemAtraso.toFixed(2)}
+                </Text>
+                <Text style={styles.modalTexto}>
+                  Valor do atraso: R$ {valorAtraso.toFixed(2)}
+                </Text>
+                <Text style={styles.modalTexto}>
+                  Multa (20% das horas de atraso): R$ {multa.toFixed(2)}
+                </Text>
+                <Text style={styles.modalTexto}>
+                  Preço final: R$ {precoFinal.toFixed(2)}
+                </Text>
 
-                <TouchableOpacity style={styles.botaoConfirmar} onPress={confirmarDevolucao}>
+                <TouchableOpacity
+                  style={styles.botaoConfirmar}
+                  onPress={confirmarDevolucao}
+                >
                   <Text style={styles.textoBtn}>Confirmar</Text>
                 </TouchableOpacity>
 
-                <TouchableOpacity style={styles.botaoCancelar} onPress={() => setModalVisible(false)}>
+                <TouchableOpacity
+                  style={styles.botaoCancelar}
+                  onPress={() => setModalVisible(false)}
+                >
                   <Text style={styles.textoBtn}>Cancelar</Text>
                 </TouchableOpacity>
               </>
@@ -186,72 +242,71 @@ const Alugado = () => {
   );
 };
 
-
 const styles = StyleSheet.create({
   scrollContainer: {
     paddingVertical: 10,
-    alignItems: 'center',
+    alignItems: "center",
   },
   container: {
     marginTop: width * 0.025,
     width: width * 0.8,
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
     borderWidth: width * 0.004,
-    borderColor: '#5271FF',
+    borderColor: "#5271FF",
     borderRadius: 30,
     marginBottom: 15,
   },
   info: {
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     marginLeft: width * 0.05,
   },
   carro: {
     width: width * 0.19,
     height: width * 0.19,
-    resizeMode: 'contain',
+    resizeMode: "contain",
   },
   texto: {
-    color: 'white',
+    color: "white",
     fontSize: width * 0.03,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginVertical: 5,
   },
   textoData: {
-    color: 'white',
+    color: "white",
     fontSize: width * 0.03,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginVertical: 5,
   },
   textoBtn: {
-    color: 'white',
+    color: "white",
     fontSize: width * 0.025,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   botao: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     padding: 10,
     borderRadius: 5,
   },
   modalContainer: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
   },
   modalContent: {
-    backgroundColor: 'white',
+    backgroundColor: "white",
     padding: 20,
     borderRadius: 10,
-    width: '80%',
-    alignItems: 'center',
+    width: "80%",
+    alignItems: "center",
   },
   modalTitulo: {
     fontSize: 18,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginBottom: 10,
   },
   modalTexto: {
@@ -259,13 +314,13 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   botaoConfirmar: {
-    backgroundColor: '#38B6FF',
+    backgroundColor: "#38B6FF",
     padding: 10,
     borderRadius: 5,
     marginTop: 10,
   },
   botaoCancelar: {
-    backgroundColor: 'red',
+    backgroundColor: "red",
     padding: 10,
     borderRadius: 5,
     marginTop: 10,

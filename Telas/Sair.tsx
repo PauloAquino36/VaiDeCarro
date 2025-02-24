@@ -14,15 +14,15 @@ const Sair = () => {
     console.log('Saindo...');
     navigation.navigate('Login'); // Navega para a tela de login
   };
-  
+
   const Nsair = () => {
     console.log('Não saiu...');
     navigation.goBack(); // Volta para a tela anterior
   };
 
   return (
-    <View style={styles.container}>      
-      <Image source={require('../assets/Imgs/VaiDeCarro_logo.png')} style={styles.logo} /> 
+    <View style={styles.container}>
+      <Image source={require('../assets/Imgs/VaiDeCarro_logo.png')} style={styles.logo} />
       <View style={styles.container2}>
         <Text style={styles.texto}>Deseja realmente sair?</Text>
         <BotaoContornado title="Sim" onPress={sair} />

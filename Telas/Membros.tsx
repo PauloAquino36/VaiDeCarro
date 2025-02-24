@@ -30,7 +30,7 @@ const Membros = () => {
     numero: '',
     cpf: '',
   });
-  
+
 
   const handleInputChange = (key: keyof Membro, value: string) => {
     setNovoMembro((prevMembro) => ({
@@ -92,9 +92,9 @@ const Membros = () => {
 
       <View style={styles.searchContainer}>
         <Icon name="search" size={20} color="#38B6FF" style={styles.icon} />
-        <TextInput 
-          style={styles.searchBar} 
-          placeholder="Pesquisar..." 
+        <TextInput
+          style={styles.searchBar}
+          placeholder="Pesquisar..."
           placeholderTextColor="#888"
         />
       </View>
@@ -123,36 +123,36 @@ const Membros = () => {
               <Picker.Item label="Proprietário da Frota" value="Proprietário da Frota" />
             </Picker>
 
-            <TextInput 
-              style={styles.input} 
-              placeholder="Nome" 
+            <TextInput
+              style={styles.input}
+              placeholder="Nome"
               value={novoMembro.nome}
               onChangeText={(value) => handleInputChange('nome', value)}
             />
-            <TextInput 
-              style={styles.input} 
-              placeholder="Email" 
+            <TextInput
+              style={styles.input}
+              placeholder="Email"
               keyboardType="email-address"
               value={novoMembro.email}
               onChangeText={(value) => handleInputChange('email', value)}
             />
-            <TextInput 
-              style={styles.input} 
-              placeholder="Senha" 
+            <TextInput
+              style={styles.input}
+              placeholder="Senha"
               secureTextEntry
               value={novoMembro.senha}
               onChangeText={(value) => handleInputChange('senha', value)}
             />
-            <TextInput 
-              style={styles.input} 
-              placeholder="Número" 
+            <TextInput
+              style={styles.input}
+              placeholder="Número"
               keyboardType="phone-pad"
               value={novoMembro.numero}
               onChangeText={(value) => handleInputChange('numero', value)}
             />
-            <TextInput 
-              style={styles.input} 
-              placeholder="CPF" 
+            <TextInput
+              style={styles.input}
+              placeholder="CPF"
               keyboardType="numeric"
               value={novoMembro.cpf}
               onChangeText={(value) => handleInputChange('cpf', value)}
