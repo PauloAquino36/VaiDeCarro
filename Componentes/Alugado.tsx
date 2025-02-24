@@ -186,6 +186,7 @@ const Alugado = () => {
       <Modal visible={modalVisible} transparent animationType="slide">
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
+            
             <Text style={styles.modalTitulo}>Resumo do Aluguel</Text>
             {aluguelSelecionado && (
               <>
@@ -205,7 +206,7 @@ const Alugado = () => {
                 </Text>
                 <Text style={styles.modalTexto}>
                   Preço por hora: R${" "}
-                  {aluguelSelecionado.carro.preco_por_hora.toFixed(2)}
+                  {aluguelSelecionado.carro.preco_por_hora}
                 </Text>
                 <Text style={styles.modalTexto}>
                   Valor sem atraso: R$ {valorSemAtraso.toFixed(2)}

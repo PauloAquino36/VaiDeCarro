@@ -9,7 +9,6 @@ const { width } = Dimensions.get('window');
 
 interface Carro {
   nome: string;
-  marca: string;
   ano: string;
   placa: string;
   foto?: string;
@@ -23,10 +22,10 @@ const Carros = () => {
   const [carros, setCarros] = useState<Carro[]>([]);
   const [novoCarro, setNovoCarro] = useState<Carro>({
     nome: '',
-    marca: '',
     ano: '',
     placa: '',
   });
+  const [searchText, setSearchText] = useState(''); // Estado para o texto da pesquisa
 
   const handleInputChange = (key: keyof Carro, value: string) => {
     setNovoCarro((prevCarro) => ({
@@ -36,32 +35,58 @@ const Carros = () => {
   };
 
   const adicionarCarro = async () => {
-    if (!novoCarro.nome || !novoCarro.placa) {
-      Alert.alert('Erro', 'Preencha pelo menos Nome e Placa');
+    const { nome, ano, placa, preco_por_hora, consumo_por_litro, foto } = novoCarro;
+  
+    // Array para armazenar campos obrigatórios que estão vazios
+    const camposFaltando = [];
+  
+    if (!nome) camposFaltando.push('Nome');
+    if (!ano) camposFaltando.push('Ano');
+    if (!placa) camposFaltando.push('Placa');
+    if (!preco_por_hora) camposFaltando.push('Preço por Hora');
+    if (!consumo_por_litro) camposFaltando.push('Consumo por Litro');
+    if (!foto) camposFaltando.push('URL da Foto');
+  
+    // Se houver campos faltando, exiba um alerta com os nomes deles
+    if (camposFaltando.length > 0) {
+      Alert.alert('Erro', `Por favor, preencha os seguintes campos obrigatórios: ${camposFaltando.join(', ')}.`);
       return;
     }
-
+  
+    // Verificar se os campos que devem conter números realmente contêm apenas números
+    const numericFields = { ano, preco_por_hora, consumo_por_litro };
+  
+    for (const [key, value] of Object.entries(numericFields)) {
+      if (value && !/^\d+$/.test(value)) {
+        Alert.alert('Erro', `Por favor, insira apenas números no campo ${key}.`);
+        return;
+      }
+    }
+  
     novoCarro.status = 'disponível';
-
+  
     const novosCarros = [...carros, novoCarro];
-
-    // Chame setCarros aqui para atualizar a lista no componente CarrosCrud
+  
+    // Atualizar a lista no componente CarrosCrud
     setCarros(novosCarros);
-
+  
     // Salvar carros no AsyncStorage
     try {
       await AsyncStorage.setItem('@carros', JSON.stringify(novosCarros));
     } catch (error) {
       console.error('Erro ao salvar carros no AsyncStorage:', error);
     }
-
-    setNovoCarro({ nome: '', marca: '', ano: '', placa: '' });
+  
+    setNovoCarro({ 
+      nome: '', 
+      ano: '', 
+      placa: '', 
+      preco_por_hora: '', 
+      consumo_por_litro: '', 
+      foto: '' 
+    });
     setModalVisible(false);
   };
-
-
-
-
 
   useEffect(() => {
     const carregarCarros = async () => {
@@ -78,6 +103,12 @@ const Carros = () => {
     carregarCarros();
   }, []);
 
+  // Função para filtrar carros com base no texto de pesquisa
+  const filteredCarros = carros.filter(car => 
+    car.nome.toLowerCase().includes(searchText.toLowerCase()) || 
+    car.placa.toLowerCase().includes(searchText.toLowerCase())
+  );
+
   return (
     <View style={styles.container}>
       <Image source={require('../assets/Imgs/VaiDeCarro_logo.png')} style={styles.logo} />
@@ -88,6 +119,8 @@ const Carros = () => {
           style={styles.searchBar}
           placeholder="Pesquisar..."
           placeholderTextColor="#888"
+          value={searchText} // Atualiza o valor do texto de pesquisa
+          onChangeText={setSearchText} // Atualiza o estado do texto de pesquisa
         />
       </View>
 
@@ -96,7 +129,7 @@ const Carros = () => {
         <Text style={styles.textoBtn}>Adicionar Carro</Text>
       </TouchableOpacity>
 
-      <CarrosCrud carros={carros} setCarros={setCarros} />
+      <CarrosCrud carros={filteredCarros} setCarros={setCarros} /> {/* Passa a lista filtrada para o CarrosCrud */}
 
       <Modal animationType="slide" transparent={true} visible={modalVisible}>
         <View style={styles.modalContainer}>
@@ -159,6 +192,7 @@ const Carros = () => {
     </View>
   );
 };
+
 
 const styles = StyleSheet.create({
   container: {

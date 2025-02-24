@@ -141,7 +141,12 @@ const CarrosCrud: React.FC<CarrosCrudProps> = ({ carros, setCarros }) => {
     setShowRentModal(true);
   };
 
-  const handleConfirmRent = () => {
+  const handleConfirmRent = async () => {
+    if (!nomeCliente || !telefoneCliente || !cpfCliente || !enderecoCliente || !dataNascimentoCliente) {
+      Alert.alert('Erro', 'Por favor, preencha todos os campos obrigatórios.');
+      return;
+    }
+  
     if (selectedCarro) {
       const novoAluguel: Aluguel = {
         carro: selectedCarro,
@@ -155,30 +160,38 @@ const CarrosCrud: React.FC<CarrosCrudProps> = ({ carros, setCarros }) => {
         horaInicio: horaInicioAluguel,
         horaTermino: horaTerminoAluguel.toISOString(),
       };
-
-      const novosAlugueis = [...aluguéis, novoAluguel];
-      salvarAlugueis(novosAlugueis);
-
-      const novosCarros = carros.map(carro =>
-        carro.placa === selectedCarro.placa
-          ? { ...carro, status: 'indisponível' }
-          : carro
-      );
-      salvarCarros(novosCarros);
-
-      setShowRentModal(false);
-      Alert.alert('Aluguel registrado com sucesso!');
+  
+      try {
+        // Pegamos os aluguéis armazenados no AsyncStorage
+        const alugueisSalvos = await AsyncStorage.getItem("@aluguéis");
+        const alugueisExistentes: Aluguel[] = alugueisSalvos ? JSON.parse(alugueisSalvos) : [];
+  
+        // Adicionamos o novo aluguel sem substituir os anteriores
+        const novosAlugueis = [...alugueisExistentes, novoAluguel];
+  
+        // Salvamos a nova lista no AsyncStorage
+        await AsyncStorage.setItem("@aluguéis", JSON.stringify(novosAlugueis));
+  
+        // Atualizamos o estado
+        setAlugueis(novosAlugueis);
+  
+        // Atualizamos o status do carro para 'indisponível'
+        const novosCarros = carros.map(carro =>
+          carro.placa === selectedCarro.placa ? { ...carro, status: "indisponível" } : carro
+        );
+        await AsyncStorage.setItem("@carros", JSON.stringify(novosCarros));
+        setCarros(novosCarros);
+  
+        setShowRentModal(false);
+        Alert.alert("Aluguel registrado com sucesso!");
+      } catch (error) {
+        console.error("Erro ao salvar aluguel:", error);
+        Alert.alert("Erro", "Ocorreu um erro ao registrar o aluguel.");
+      }
     }
   };
+  
 
-  const salvarAlugueis = async (novosAlugueis: Aluguel[]) => {
-    try {
-      await AsyncStorage.setItem('@aluguéis', JSON.stringify(novosAlugueis));
-      setAlugueis(novosAlugueis);
-    } catch (error) {
-      console.error('Erro ao salvar aluguéis:', error);
-    }
-  };
 
   interface DateTimePickerEvent {
     type: string;

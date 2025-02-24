@@ -30,7 +30,7 @@ const Membros = () => {
     numero: '',
     cpf: '',
   });
-
+  const [searchText, setSearchText] = useState(''); // Estado para texto da pesquisa
 
   const handleInputChange = (key: keyof Membro, value: string) => {
     setNovoMembro((prevMembro) => ({
@@ -40,8 +40,25 @@ const Membros = () => {
   };
 
   const adicionarMembro = async () => {
-    if (!novoMembro.nome || !novoMembro.email) {
-      Alert.alert('Erro', 'Preencha pelo menos Nome e Email');
+    const { nome, email, senha, numero, cpf, cargo } = novoMembro;
+
+    // Verificar se todos os campos obrigatórios estão preenchidos
+    if (!nome || !email || !senha || !numero || !cpf || !cargo) {
+      Alert.alert('Erro', 'Por favor, preencha todos os campos obrigatórios.');
+      return;
+    }
+
+    // Validação do formato do email
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      Alert.alert('Erro', 'Por favor, insira um email válido.');
+      return;
+    }
+
+    // Validação do formato do CPF (considerando 11 dígitos numéricos)
+    const cpfRegex = /^\d{11}$/;
+    if (!cpfRegex.test(cpf)) {
+      Alert.alert('Erro', 'Por favor, insira um CPF válido (11 dígitos).');
       return;
     }
 
@@ -86,6 +103,11 @@ const Membros = () => {
     carregarMembros();
   }, []);
 
+  // Filtra membros com base no texto da pesquisa
+  const filteredMembros = membros.filter(membro =>
+    membro.nome.toLowerCase().includes(searchText.toLowerCase())
+  );
+
   return (
     <View style={styles.container}>
       <Image source={require('../assets/Imgs/VaiDeCarro_logo.png')} style={styles.logo} />
@@ -96,6 +118,8 @@ const Membros = () => {
           style={styles.searchBar}
           placeholder="Pesquisar..."
           placeholderTextColor="#888"
+          value={searchText}
+          onChangeText={setSearchText} // Atualiza o texto da pesquisa
         />
       </View>
 
@@ -104,7 +128,7 @@ const Membros = () => {
         <Text style={styles.textoBtn}>Adicionar Membro</Text>
       </TouchableOpacity>
 
-      <MembrosCrud membros={membros} setMembros={setMembros} />
+      <MembrosCrud membros={filteredMembros} setMembros={setMembros} />
 
       <Modal animationType="slide" transparent={true} visible={modalVisible}>
         <View style={styles.modalContainer}>
@@ -174,6 +198,7 @@ const Membros = () => {
     </View>
   );
 };
+
 
 const styles = StyleSheet.create({
   container: {
