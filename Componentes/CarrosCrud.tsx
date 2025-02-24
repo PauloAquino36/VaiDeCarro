@@ -57,6 +57,7 @@ const CarrosCrud: React.FC<CarrosCrudProps> = ({ carros, setCarros }) => {
   const [enderecoCliente, setEnderecoCliente] = useState<string>('');
   const [dataNascimentoCliente, setDataNascimentoCliente] = useState('');
   const [horaTerminoAluguel, setHoraTerminoAluguel] = useState(new Date());
+  const [isDatePickerVisibleNascimento, setDatePickerVisibilityNascimento] = useState(false);
   const [horaInicioAluguel, setHoraInicioAluguel] = useState(new Date().toISOString());
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
   const { getCargo } = useAuth();
@@ -146,7 +147,7 @@ const CarrosCrud: React.FC<CarrosCrudProps> = ({ carros, setCarros }) => {
       Alert.alert('Erro', 'Por favor, preencha todos os campos obrigatórios.');
       return;
     }
-  
+
     if (selectedCarro) {
       const novoAluguel: Aluguel = {
         carro: selectedCarro,
@@ -160,28 +161,28 @@ const CarrosCrud: React.FC<CarrosCrudProps> = ({ carros, setCarros }) => {
         horaInicio: horaInicioAluguel,
         horaTermino: horaTerminoAluguel.toISOString(),
       };
-  
+
       try {
         // Pegamos os aluguéis armazenados no AsyncStorage
         const alugueisSalvos = await AsyncStorage.getItem("@aluguéis");
         const alugueisExistentes: Aluguel[] = alugueisSalvos ? JSON.parse(alugueisSalvos) : [];
-  
+
         // Adicionamos o novo aluguel sem substituir os anteriores
         const novosAlugueis = [...alugueisExistentes, novoAluguel];
-  
+
         // Salvamos a nova lista no AsyncStorage
         await AsyncStorage.setItem("@aluguéis", JSON.stringify(novosAlugueis));
-  
+
         // Atualizamos o estado
         setAlugueis(novosAlugueis);
-  
+
         // Atualizamos o status do carro para 'indisponível'
         const novosCarros = carros.map(carro =>
           carro.placa === selectedCarro.placa ? { ...carro, status: "indisponível" } : carro
         );
         await AsyncStorage.setItem("@carros", JSON.stringify(novosCarros));
         setCarros(novosCarros);
-  
+
         setShowRentModal(false);
         Alert.alert("Aluguel registrado com sucesso!");
       } catch (error) {
@@ -190,7 +191,7 @@ const CarrosCrud: React.FC<CarrosCrudProps> = ({ carros, setCarros }) => {
       }
     }
   };
-  
+
 
 
   interface DateTimePickerEvent {
@@ -221,6 +222,25 @@ const CarrosCrud: React.FC<CarrosCrudProps> = ({ carros, setCarros }) => {
   if (carros.length === 0) {
     return <Text style={styles.texto}>Carregando...</Text>;
   }
+
+  const hoje = new Date();
+  const limiteIdade = new Date(hoje.getFullYear() - 18, hoje.getMonth(), hoje.getDate());
+  const showDatePickerNascimento = () => {
+    setDatePickerVisibilityNascimento(true);
+  };
+
+  const hideDatePickerNascimento = () => {
+    setDatePickerVisibilityNascimento(false);
+  };
+
+  interface HandleConfirmNascimento {
+    (date: Date): void;
+  }
+
+  const handleConfirmNascimento: HandleConfirmNascimento = (date) => {
+    setDataNascimentoCliente(date.toISOString().split('T')[0]);
+    hideDatePickerNascimento();
+  };
 
   return (
     <ScrollView contentContainerStyle={styles.scrollContainer}>
@@ -355,10 +375,16 @@ const CarrosCrud: React.FC<CarrosCrudProps> = ({ carros, setCarros }) => {
 
       {/* Modal para aluguel */}
       {showRentModal && (
-        <Modal visible={showRentModal} animationType="slide" transparent={true} onRequestClose={() => setShowRentModal(false)}>
+        <Modal
+          visible={showRentModal}
+          animationType="slide"
+          transparent={true}
+          onRequestClose={() => setShowRentModal(false)}
+        >
           <View style={styles.modalContainer}>
             <View style={styles.modalContent}>
               <Text style={styles.modalTitle}>Alugar Carro</Text>
+
               <TextInput
                 style={styles.input}
                 value={nomeCliente}
@@ -383,16 +409,29 @@ const CarrosCrud: React.FC<CarrosCrudProps> = ({ carros, setCarros }) => {
                 onChangeText={setEnderecoCliente}
                 placeholder="Endereço do Cliente"
               />
-              <TextInput
-                style={styles.input}
-                value={dataNascimentoCliente}
-                onChangeText={setDataNascimentoCliente}
-                placeholder="Data de Nascimento (YYYY-MM-DD)"
-              />
+              <TouchableOpacity onPress={showDatePickerNascimento} style={styles.dateButton}>
+                <Text style={styles.dateButtonText}>
+                  {dataNascimentoCliente ? new Date(dataNascimentoCliente).toLocaleDateString() : "Selecionar Data de Nascimento"}
+                </Text>
+              </TouchableOpacity>
 
-              {/* Botão para abrir o DateTimePicker */}
+              {isDatePickerVisibleNascimento && (
+                <DateTimePickerModal
+                  isVisible={isDatePickerVisibleNascimento}
+                  mode="date"
+                  date={limiteIdade} // Começa com a data limite de 18 anos
+                  onConfirm={handleConfirmNascimento}
+                  onCancel={hideDatePickerNascimento}
+                  maximumDate={limiteIdade} // O cliente só pode escolher datas com pelo menos 18 anos
+                  minimumDate={new Date(1900, 0, 1)} // Evita datas absurdamente antigas
+                />
+              )}
+
+              {/* Botão para abrir o DatePicker da Hora de Término */}
               <TouchableOpacity onPress={showDatePicker} style={styles.dateButton}>
-                <Text style={styles.dateButtonText}>{`Hora de Término: ${horaTerminoAluguel.toLocaleString()}`}</Text>
+                <Text style={styles.dateButtonText}>
+                  {`Hora de Término: ${horaTerminoAluguel.toLocaleString()}`}
+                </Text>
               </TouchableOpacity>
 
               {isDatePickerVisible && (
@@ -416,6 +455,7 @@ const CarrosCrud: React.FC<CarrosCrudProps> = ({ carros, setCarros }) => {
           </View>
         </Modal>
       )}
+
 
 
     </ScrollView>

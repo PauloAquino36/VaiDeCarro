@@ -18,7 +18,7 @@
         "preco_por_hora": 120.00,
         "consumo_por_litro": 8.5,
         "placa": "GHI-9101",
-        "status": "indisponível"
+        "status": "disponível"
       },
       {
         "id": 3,
@@ -28,17 +28,17 @@
         "preco_por_hora": 115.00,
         "consumo_por_litro": 7.5,
         "placa": "PQR-1617",
-        "status": "indisponível"
+        "status": "disponível"
       },
       {
         "id": 4,
-        "foto": "corvette2019amarelo.jpg",
-        "nome": "Chevrolet Corvette",
-        "ano": 2019,
+        "foto": "https://drive.google.com/uc?export=view&id=1RomUTj4gF828iKkZ7zrjgEZmPA2D4WWx",
+        "nome": "Batmovel",
+        "ano": 2005,
         "preco_por_hora": 130.00,
         "consumo_por_litro": 6.9,
         "placa": "STU-1819",
-        "status": "indisponível"
+        "status": "disponível"
       },
       {
         "id": 5,
@@ -48,7 +48,7 @@
         "preco_por_hora": 140.00,
         "consumo_por_litro": 6.5,
         "placa": "VWX-2021",
-        "status": "indisponível"
+        "status": "disponível"
       }
     ]
   }

@@ -20,7 +20,7 @@ const Login = () => {
 
   const handleLogin = async () => {
     // Verifica se o usuário é o administrador
-    if (email === 'admin@exemplo.com' && senha === 'senhaAdmin') {
+    if (email === 'adm' && senha === 'adm') {
       const user = { email, cargo: 'Administrador' }; // Define o usuário como administrador
       login(user); // Atualiza o estado de autenticação com o usuário
       navigation.navigate('Inicio');

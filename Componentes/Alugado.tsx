@@ -313,7 +313,9 @@ const styles = StyleSheet.create({
   carro: {
     width: width * 0.19,
     height: width * 0.19,
-    resizeMode: "contain",
+    resizeMode: 'contain',
+    borderWidth: width * 0.004,
+    borderColor: 'red',
   },
   texto: {
     color: "white",

@@ -3,7 +3,7 @@ import { useNavigation } from '@react-navigation/native';
 import BotaoContornado from '../Componentes/BotaoContornado';
 import { useAuth } from '../AuthContext'; // Importe o AuthContext
 
-const { width } = Dimensions.get('window');
+const { width, height } = Dimensions.get('window');
 
 const Sair = () => {
   const navigation = useNavigation<any>();
@@ -46,7 +46,6 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#38B6FF',
     width: width * 0.5,
-    height: width * 0.5,
     alignItems: 'center',
   },
   logo: {
