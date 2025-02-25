@@ -33,54 +33,57 @@ const Inicio = () => {
   
       let alugueis = JSON.parse(dadosSalvos);
   
-      // Ordenar por data (de forma crescente)
-      alugueis.sort((a: Aluguel, b: Aluguel) => {
-        const dataA: string = a.data.split("/").reverse().join("-");
-        const dataB: string = b.data.split("/").reverse().join("-");
-        return new Date(dataA).getTime() - new Date(dataB).getTime();
+      if (!Array.isArray(alugueis) || alugueis.length === 0) {
+        Alert.alert('Erro', 'Os dados do relatório estão vazios ou corrompidos.');
+        return;
+      }
+  
+      // Ordenar por data de início (hora_inicio)
+      alugueis.sort((a, b) => {
+        return new Date(a.hora_inicio).getTime() - new Date(b.hora_inicio).getTime();
       });
   
-      // Criar HTML dinâmico
-      interface Aluguel {
-        nome: string;
-        data: string;
-        valor: number;
-      }
-
-      const htmlContent: string = `
+      // Criar HTML dinâmico para o relatório
+      const htmlContent = `
         <h1>Relatório de Aluguéis</h1>
         <table style="width:100%; border: 1px solid black; border-collapse: collapse;">
           <tr>
-        <th style="border: 1px solid black; padding: 5px;">Nome</th>
-        <th style="border: 1px solid black; padding: 5px;">Data do Aluguel</th>
-        <th style="border: 1px solid black; padding: 5px;">Valor</th>
+            <th style="border: 1px solid black; padding: 5px;">Cliente</th>
+            <th style="border: 1px solid black; padding: 5px;">Telefone</th>
+            <th style="border: 1px solid black; padding: 5px;">Carro</th>
+            <th style="border: 1px solid black; padding: 5px;">Início</th>
+            <th style="border: 1px solid black; padding: 5px;">Entrega</th>
+            <th style="border: 1px solid black; padding: 5px;">Horas Gastas</th>
+            <th style="border: 1px solid black; padding: 5px;">Atrasado?</th>
+            <th style="border: 1px solid black; padding: 5px;">Valor Pago</th>
           </tr>
-          ${alugueis.map((aluguel: Aluguel) => `
-        <tr>
-          <td style="border: 1px solid black; padding: 5px;">${aluguel.nome}</td>
-          <td style="border: 1px solid black; padding: 5px;">${aluguel.data}</td>
-          <td style="border: 1px solid black; padding: 5px;">${aluguel.valor}</td>
-        </tr>
+          ${alugueis.map(aluguel => `
+            <tr>
+              <td style="border: 1px solid black; padding: 5px;">${aluguel.nome_cliente}</td>
+              <td style="border: 1px solid black; padding: 5px;">${aluguel.telefone_cliente}</td>
+              <td style="border: 1px solid black; padding: 5px;">${aluguel.nome_carro}</td>
+              <td style="border: 1px solid black; padding: 5px;">${new Date(aluguel.hora_inicio).toLocaleString()}</td>
+              <td style="border: 1px solid black; padding: 5px;">${new Date(aluguel.hora_entrega).toLocaleString()}</td>
+              <td style="border: 1px solid black; padding: 5px;">${aluguel.horas_gastas}h</td>
+              <td style="border: 1px solid black; padding: 5px;">${aluguel.pago_com_atraso ? "Sim" : "Não"}</td>
+              <td style="border: 1px solid black; padding: 5px;">R$ ${aluguel.valor_pago}</td>
+            </tr>
           `).join('')}
         </table>
       `;
   
       const { uri } = await Print.printToFileAsync({ html: htmlContent });
+      console.log('Arquivo salvo em:', uri);
   
-      // Copiar o arquivo para um local acessível
-      const novoUri = FileSystem.documentDirectory + 'relatorio.pdf';
-      await FileSystem.moveAsync({ from: uri, to: novoUri });
-  
-      console.log('Arquivo salvo em:', novoUri);
-  
-      // Abrir o PDF no navegador interno
-      await WebBrowser.openBrowserAsync(novoUri);
+      // Abrir o PDF automaticamente
+      await WebBrowser.openBrowserAsync(uri);
   
     } catch (error) {
       console.error('Erro ao gerar relatório:', error);
       Alert.alert('Erro', 'Não foi possível gerar o relatório.');
     }
   };
+  
 
   return (
     <View style={styles.container}>
