@@ -2,7 +2,7 @@
     "carros": [
       {
         "id": 1,
-        "foto": "camaro2019branco.jpg",
+        "foto": "https://drive.google.com/uc?export=view&id=1Pd88kZpBxIEKbOQ0q1niM1ds3t9wRCm6",
         "nome": "Chevrolet Camaro",
         "ano": 2019,
         "preco_por_hora": 110.00,
@@ -12,7 +12,7 @@
       },
       {
         "id": 2,
-        "foto": "mustang2019preto.jpg",
+        "foto": "https://drive.google.com/uc?export=view&id=1Y4RB1ac7eEhifriPA6JC4dTiouBpeBxM",
         "nome": "Ford Mustang",
         "ano": 2019,
         "preco_por_hora": 120.00,
@@ -22,7 +22,7 @@
       },
       {
         "id": 3,
-        "foto": "challenger2019vermelho.jpg",
+        "foto": "https://drive.google.com/uc?export=view&id=1F_oIfBtx8jaHz54z7n_hqzcjn0qzg4oq",
         "nome": "Dodge Challenger",
         "ano": 2019,
         "preco_por_hora": 115.00,
@@ -42,7 +42,7 @@
       },
       {
         "id": 5,
-        "foto": "viper2019azul.jpg",
+        "foto": "https://drive.google.com/uc?export=view&id=1LEDOnJf1mCOLMZ8ej596HkIiePy30Srb",
         "nome": "Dodge Viper",
         "ano": 2019,
         "preco_por_hora": 140.00,

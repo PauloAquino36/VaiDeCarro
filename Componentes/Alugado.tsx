@@ -173,10 +173,7 @@ const Alugado = () => {
       ) : (
         filteredAlugueis.map((aluguel, index) => (
           <View key={index} style={styles.container}>
-            <Image
-              source={{ uri: `../bancoDados/Carros/${aluguel.carro.foto}` }}
-              style={styles.carro}
-            />
+            <Image source={{ uri: aluguel.carro.foto }} style={styles.carro} />
             <View style={styles.info}>
               <Text style={styles.texto}>{`${aluguel.carro.nome}`}</Text>
               <Text style={styles.texto}>{`${aluguel.cliente.nome}`}</Text>
@@ -314,8 +311,8 @@ const styles = StyleSheet.create({
     width: width * 0.19,
     height: width * 0.19,
     resizeMode: 'contain',
-    borderWidth: width * 0.004,
-    borderColor: 'red',
+    //borderWidth: width * 0.004,
+    //borderColor: 'red',
   },
   texto: {
     color: "white",

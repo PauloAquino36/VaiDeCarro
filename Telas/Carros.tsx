@@ -129,7 +129,7 @@ const Carros = () => {
         <Text style={styles.textoBtn}>Adicionar Carro</Text>
       </TouchableOpacity>
 
-      <CarrosCrud carros={filteredCarros} setCarros={setCarros} /> {/* Passa a lista filtrada para o CarrosCrud */}
+      <CarrosCrud carros={filteredCarros} setCarros={setCarros} />
 
       <Modal animationType="slide" transparent={true} visible={modalVisible}>
         <View style={styles.modalContainer}>

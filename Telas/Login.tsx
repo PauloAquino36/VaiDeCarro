@@ -5,12 +5,19 @@ import BotaoContornado from '../Componentes/BotaoContornado';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useAuth } from '../AuthContext';
 
+type Membro = {
+  email: string;
+  senha: string;
+  cargo: string;
+};
+
 const { width } = Dimensions.get('window');
 
 type RootStackParamList = {
   Inicio: undefined;
-  // Add other routes here if needed
+  Login: undefined;
 };
+
 
 const Login = () => {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
@@ -19,36 +26,25 @@ const Login = () => {
   const [senha, setSenha] = useState('');
 
   const handleLogin = async () => {
-    // Verifica se o usuário é o administrador
-    if (email === 'adm' && senha === 'adm') {
-      const user = { email, cargo: 'Administrador' }; // Define o usuário como administrador
-      login(user); // Atualiza o estado de autenticação com o usuário
-      navigation.navigate('Inicio');
-      return;
-    }
-
-    // Carregar a lista de membros do AsyncStorage
     const membrosStorage = await AsyncStorage.getItem('@membros');
     const membros: Membro[] = membrosStorage ? JSON.parse(membrosStorage) : [];
-
-    // Verifica se o email e a senha correspondem a um membro
-    interface Membro {
-      email: string;
-      senha: string;
-      cargo: string;
+  
+    if (email === 'adm' && senha === 'adm') {
+      const user = { email, cargo: 'Administrador' };
+      login(user); // ✅ Isso automaticamente mostrará "Inicio" no AppNavigator
+      return;
     }
-
-    const membroEncontrado: Membro | undefined = membros.find((membro: Membro) => membro.email === email && membro.senha === senha);
-
+  
+    const membroEncontrado = membros.find(membro => membro.email === email && membro.senha === senha);
+  
     if (membroEncontrado) {
-      const user = { email: membroEncontrado.email, cargo: membroEncontrado.cargo }; // Define o usuário encontrado
-      login(user); // Atualiza o estado de autenticação com o usuário encontrado
-      console.log('cargo', user.cargo)
-      navigation.navigate('Inicio');
+      const user = { email: membroEncontrado.email, cargo: membroEncontrado.cargo };
+      login(user); // ✅ A navegação ocorrerá automaticamente quando isAuthenticated for true
     } else {
       Alert.alert('Erro', 'Email ou senha inválidos');
     }
   };
+  
 
   return (
     <View style={styles.container}>

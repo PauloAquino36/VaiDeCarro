@@ -5,15 +5,21 @@ import { useAuth } from '../AuthContext'; // Importe o AuthContext
 
 const { width, height } = Dimensions.get('window');
 
+type RootStackParamList = {
+  Inicio: undefined;
+  Login: undefined;
+};
+
+
 const Sair = () => {
   const navigation = useNavigation<any>();
   const { logout } = useAuth(); // Desestruture a função de logout do contexto
 
   const sair = () => {
-    logout(); // Atualiza o estado de autenticação
+    logout();
     console.log('Saindo...');
-    navigation.navigate('Login'); // Navega para a tela de login
   };
+  
 
   const Nsair = () => {
     console.log('Não saiu...');

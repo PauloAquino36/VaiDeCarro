@@ -285,7 +285,6 @@ const CarrosCrud: React.FC<CarrosCrudProps> = ({ carros, setCarros }) => {
         </View>
       ))}
 
-      {/* Modal para ver detalhes do carro */}
       {selectedCarro && (
         <Modal visible={showModal} animationType="slide" transparent={true} onRequestClose={() => setShowModal(false)}>
           <View style={styles.modalContainer}>
@@ -306,7 +305,6 @@ const CarrosCrud: React.FC<CarrosCrudProps> = ({ carros, setCarros }) => {
         </Modal>
       )}
 
-      {/* Modal para editar carro */}
       {selectedCarro && (
         <Modal
           visible={showEditModal}
@@ -373,7 +371,6 @@ const CarrosCrud: React.FC<CarrosCrudProps> = ({ carros, setCarros }) => {
         </Modal>
       )}
 
-      {/* Modal para aluguel */}
       {showRentModal && (
         <Modal
           visible={showRentModal}
@@ -456,8 +453,6 @@ const CarrosCrud: React.FC<CarrosCrudProps> = ({ carros, setCarros }) => {
         </Modal>
       )}
 
-
-
     </ScrollView>
   );
 };
@@ -487,8 +482,8 @@ const styles = StyleSheet.create({
     width: width * 0.19,
     height: width * 0.19,
     resizeMode: 'contain',
-    borderWidth: width * 0.004,
-    borderColor: 'red',
+    //borderWidth: width * 0.004,
+    //borderColor: 'red',
   },
   texto: {
     color: 'white',
