@@ -396,14 +396,12 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     alignItems: 'center',
     marginBottom: 10,
-    width: width * 0.15,
   },
   closeBtn: {
     backgroundColor: '#FF6347',
     padding: 10,
     borderRadius: 5,
     alignItems: 'center',
-    width: width * 0.2,
   },
   closeText: {
     color: 'white',

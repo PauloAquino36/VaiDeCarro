@@ -6,6 +6,8 @@ import Alugado from '../Componentes/Alugado';
 import { useAuth } from '../AuthContext';
 import * as Print from 'expo-print';
 import * as Sharing from 'expo-sharing';
+import * as FileSystem from 'expo-file-system';
+import * as WebBrowser from 'expo-web-browser';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const { width } = Dimensions.get('window');
@@ -23,7 +25,7 @@ const Inicio = () => {
   const gerarRelatorio = async () => {
     try {
       const dadosSalvos = await AsyncStorage.getItem('@relatorios');
-      
+  
       if (!dadosSalvos) {
         Alert.alert('Erro', 'Nenhum dado encontrado para o relatório.');
         return;
@@ -33,8 +35,8 @@ const Inicio = () => {
   
       // Ordenar por data (de forma crescente)
       alugueis.sort((a: Aluguel, b: Aluguel) => {
-        const dataA = a.data.split("/").reverse().join("-");
-        const dataB = b.data.split("/").reverse().join("-");
+        const dataA: string = a.data.split("/").reverse().join("-");
+        const dataB: string = b.data.split("/").reverse().join("-");
         return new Date(dataA).getTime() - new Date(dataB).getTime();
       });
   
@@ -64,13 +66,15 @@ const Inicio = () => {
       `;
   
       const { uri } = await Print.printToFileAsync({ html: htmlContent });
-      console.log('Arquivo salvo em:', uri);
   
-      if (await Sharing.isAvailableAsync()) {
-        await Sharing.shareAsync(uri);
-      } else {
-        Alert.alert('Erro', 'Não é possível compartilhar o arquivo.');
-      }
+      // Copiar o arquivo para um local acessível
+      const novoUri = FileSystem.documentDirectory + 'relatorio.pdf';
+      await FileSystem.moveAsync({ from: uri, to: novoUri });
+  
+      console.log('Arquivo salvo em:', novoUri);
+  
+      // Abrir o PDF no navegador interno
+      await WebBrowser.openBrowserAsync(novoUri);
   
     } catch (error) {
       console.error('Erro ao gerar relatório:', error);
