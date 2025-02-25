@@ -15,6 +15,9 @@ interface Aluguel {
   };
   cliente: {
     nome: string;
+    telefone: string;
+    endereco: string;
+    cpf: string;
   };
   horaInicio: string;
   horaTermino: string;
@@ -118,12 +121,12 @@ const Alugado = () => {
       try {
         const carrosStorage = await AsyncStorage.getItem("@carros");
         let carrosDisponiveis = carrosStorage ? JSON.parse(carrosStorage) : [];
-
+  
         const carroAtualizado = {
           ...aluguelSelecionado.carro,
           status: "disponível",
         };
-
+  
         const carroExistenteIndex: number = carrosDisponiveis.findIndex(
           (carro: { id: number }) => carro.id === carroAtualizado.id
         );
@@ -132,26 +135,47 @@ const Alugado = () => {
         } else {
           carrosDisponiveis.push(carroAtualizado);
         }
-
-        await AsyncStorage.setItem(
-          "@carros",
-          JSON.stringify(carrosDisponiveis)
-        );
-
+  
+        await AsyncStorage.setItem("@carros", JSON.stringify(carrosDisponiveis));
+  
         const novosAlugueis = alugueis.filter(
           (item) => item.carro.id !== aluguelSelecionado.carro.id
         );
         await AsyncStorage.setItem("@aluguéis", JSON.stringify(novosAlugueis));
-
+  
+        // Criar um novo relatório
+        const novoRelatorio = {
+          nome_cliente: aluguelSelecionado.cliente.nome,
+          telefone_cliente: aluguelSelecionado.cliente.telefone,
+          cpf_cliente: aluguelSelecionado.cliente.cpf,
+          endereco_cliente: aluguelSelecionado.cliente.endereco,
+          nome_carro: aluguelSelecionado.carro.nome,
+          hora_inicio: aluguelSelecionado.horaInicio,
+          hora_entrega: new Date().toISOString(),
+          horas_gastas: Math.ceil(
+            (new Date().getTime() - new Date(aluguelSelecionado.horaInicio).getTime()) /
+              (1000 * 60 * 60)
+          ),
+          pago_com_atraso: new Date() > new Date(aluguelSelecionado.horaTermino),
+          valor_pago: precoFinal.toFixed(2),
+        };
+  
+        // Adicionar o relatório ao AsyncStorage
+        const relatoriosStorage = await AsyncStorage.getItem("@relatorios");
+        let relatorios = relatoriosStorage ? JSON.parse(relatoriosStorage) : [];
+        relatorios.push(novoRelatorio);
+        await AsyncStorage.setItem("@relatorios", JSON.stringify(relatorios));
+  
         setAlugueis(novosAlugueis);
         setModalVisible(false);
         setAluguelSelecionado(null);
-        console.log("Carro devolvido e atualizado como disponível!");
+        console.log("Carro devolvido, atualizado como disponível e relatório salvo!");
       } catch (error) {
         console.error("Erro ao devolver carro:", error);
       }
     }
   };
+  
 
   const cargoUsuario = getCargo();
 

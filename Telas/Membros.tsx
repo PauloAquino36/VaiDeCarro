@@ -17,8 +17,6 @@ interface Membro {
   cpf: string;
 }
 
-
-
 const Membros = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const [membros, setMembros] = useState<Membro[]>([]);

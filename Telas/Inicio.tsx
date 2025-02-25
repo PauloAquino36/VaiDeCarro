@@ -1,33 +1,80 @@
 import React from 'react';
-import { View, TextInput, Image, StyleSheet, Dimensions, TouchableOpacity, Text, Platform, Alert } from 'react-native';
+import { View, Image, StyleSheet, Dimensions, TouchableOpacity, Text, Platform, Alert } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import Navbar from '../Componentes/NavBar';
-import { useNavigation } from '@react-navigation/native';
 import Alugado from '../Componentes/Alugado';
 import { useAuth } from '../AuthContext';
-import RNHTMLtoPDF from 'react-native-html-to-pdf';
+import * as Print from 'expo-print';
+import * as Sharing from 'expo-sharing';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const { width } = Dimensions.get('window');
 
+type Aluguel = {
+  nome: string;
+  data: string;
+  valor: number;
+};
+
 const Inicio = () => {
-  const navigation = useNavigation();
   const { getCargo } = useAuth();
   const cargoUsuario = getCargo();
 
   const gerarRelatorio = async () => {
-    const options = {
-      html: '<h1>Relatório de Aluguéis</h1><p>Dados do relatório aqui...</p>',
-      fileName: 'Relatorio_Alugueis',
-      directory: Platform.OS === 'ios' ? 'Documents' : 'Download',
-    };
-
-    console.log('Gerando relatório...');
-
     try {
-      const file = await RNHTMLtoPDF.convert(options);
-      Alert.alert('Relatório Gerado', `O relatório foi salvo em: ${file.filePath}`);
+      const dadosSalvos = await AsyncStorage.getItem('@relatorios');
+      
+      if (!dadosSalvos) {
+        Alert.alert('Erro', 'Nenhum dado encontrado para o relatório.');
+        return;
+      }
+  
+      let alugueis = JSON.parse(dadosSalvos);
+  
+      // Ordenar por data (de forma crescente)
+      alugueis.sort((a: Aluguel, b: Aluguel) => {
+        const dataA = a.data.split("/").reverse().join("-");
+        const dataB = b.data.split("/").reverse().join("-");
+        return new Date(dataA).getTime() - new Date(dataB).getTime();
+      });
+  
+      // Criar HTML dinâmico
+      interface Aluguel {
+        nome: string;
+        data: string;
+        valor: number;
+      }
+
+      const htmlContent: string = `
+        <h1>Relatório de Aluguéis</h1>
+        <table style="width:100%; border: 1px solid black; border-collapse: collapse;">
+          <tr>
+        <th style="border: 1px solid black; padding: 5px;">Nome</th>
+        <th style="border: 1px solid black; padding: 5px;">Data do Aluguel</th>
+        <th style="border: 1px solid black; padding: 5px;">Valor</th>
+          </tr>
+          ${alugueis.map((aluguel: Aluguel) => `
+        <tr>
+          <td style="border: 1px solid black; padding: 5px;">${aluguel.nome}</td>
+          <td style="border: 1px solid black; padding: 5px;">${aluguel.data}</td>
+          <td style="border: 1px solid black; padding: 5px;">${aluguel.valor}</td>
+        </tr>
+          `).join('')}
+        </table>
+      `;
+  
+      const { uri } = await Print.printToFileAsync({ html: htmlContent });
+      console.log('Arquivo salvo em:', uri);
+  
+      if (await Sharing.isAvailableAsync()) {
+        await Sharing.shareAsync(uri);
+      } else {
+        Alert.alert('Erro', 'Não é possível compartilhar o arquivo.');
+      }
+  
     } catch (error) {
-      console.error('Erro ao gerar PDF:', error);
+      console.error('Erro ao gerar relatório:', error);
+      Alert.alert('Erro', 'Não foi possível gerar o relatório.');
     }
   };
 
